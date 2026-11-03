@@ -11,6 +11,10 @@ Dự án ứng dụng web cho phép người dùng gọi món ăn qua QR code.
 
 Xem hướng dẫn chi tiết tại [backend/README.md](./backend/README.md).
 
+## Git
+
+Xem [hướng dẫn Git cho dự án](./docs/GIT_WORKFLOW.md) để biết cách cập nhật code, tạo và chuyển nhánh, commit và đẩy code.
+
 ## Khởi chạy backend
 
 ```bash
