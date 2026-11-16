@@ -24,7 +24,8 @@ export const menuController = {
     },
     async removeCategory(req: Request, res: Response, next: NextFunction) {
         try {
-            await menuService.removeCategory(req.params.id); res.status(204).send();
+            await menuService.removeCategory(req.params.id);
+            res.status(204).send();
         } catch (error) { next(error); }
     },
     async listDishes(_req: Request, res: Response, next: NextFunction) {
@@ -44,7 +45,8 @@ export const menuController = {
     },
     async removeDish(req: Request, res: Response, next: NextFunction) {
         try {
-            await menuService.removeDish(req.params.id); res.status(204).send();
+            await menuService.removeDish(req.params.id);
+            res.status(204).send();
         } catch (error) { next(error); }
     },
 };

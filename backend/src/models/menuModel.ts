@@ -7,7 +7,7 @@ export const menuModel = {
         return data;
     },
     async listCategories() {
-        const { data, error } = await supabase.from('nhommon').select('*').order('ma_nhom');
+        const { data, error } = await supabase.from('nhommon').select('*, monan(ma_mon, ten_mon)').order('ma_nhom');
         if (error) throw new Error(error.message);
         return data;
     },
@@ -31,12 +31,12 @@ export const menuModel = {
         return data;
     },
     async createDish(input: Record<string, unknown>) {
-        const { data, error } = await supabase.from('monan').insert(input).select().single();
+        const { data, error } = await supabase.from('monan').insert(input).select('*, nhommon(ma_nhom, ten_nhom)').single();
         if (error) throw new Error(error.message);
         return data;
     },
     async updateDish(id: number, input: Record<string, unknown>) {
-        const { data, error } = await supabase.from('monan').update(input).eq('ma_mon', id).select().single();
+        const { data, error } = await supabase.from('monan').update(input).eq('ma_mon', id).select('*, nhommon(ma_nhom, ten_nhom)').single();
         if (error) throw new Error(error.message);
         return data;
     },

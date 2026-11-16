@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { errorHandler, notFoundHandler } from './middlewares/errorHandler';
 import authRoutes from './routes/authRoutes';
 import employeeRoutes from './routes/employeeRoutes';
@@ -8,6 +9,8 @@ import qrRoutes from './routes/qrRoutes';
 import tableRoutes from './routes/tableRoutes';
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);

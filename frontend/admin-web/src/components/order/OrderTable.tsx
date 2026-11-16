@@ -1,0 +1,226 @@
+'use client';
+
+import React from 'react';
+import { Eye, Printer, Check, CheckCheck, Clock } from 'lucide-react';
+import { OrderItem } from '@/types/order';
+import { Pagination } from '@/components/common/Pagination';
+
+interface OrderTableProps {
+  orders: OrderItem[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  pageSize?: number;
+  onPageChange: (page: number) => void;
+  onAcceptOrder?: (id: string) => void;
+  onServeOrder?: (id: string) => void;
+  onCompleteOrder?: (id: string) => void;
+  onPrintReceipt?: (order: OrderItem) => void;
+  onViewOrder?: (order: OrderItem) => void;
+}
+
+export function OrderTable({
+  orders,
+  currentPage,
+  totalPages,
+  totalItems,
+  pageSize = 10,
+  onPageChange,
+  onAcceptOrder,
+  onServeOrder,
+  onCompleteOrder,
+  onPrintReceipt,
+  onViewOrder,
+}: OrderTableProps) {
+  return (
+    <div className="bg-white rounded-2xl border border-[#EAE3D6] shadow-2xs overflow-hidden flex flex-col">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse table-fixed min-w-[840px]">
+          <thead>
+            <tr className="border-b border-[#F0EAE1] text-[11px] font-black text-[#8A8175] uppercase tracking-wider bg-[#FAF7F2]">
+              <th className="w-[14%] py-3.5 px-4 whitespace-nowrap">MÃ ĐƠN</th>
+              <th className="w-[12%] py-3.5 px-3 whitespace-nowrap">BÀN</th>
+              <th className="w-[18%] py-3.5 px-4 whitespace-nowrap">NHÂN VIÊN</th>
+              <th className="w-[16%] py-3.5 px-4 whitespace-nowrap">TỔNG TIỀN</th>
+              <th className="w-[14%] py-3.5 px-3 whitespace-nowrap">THỜI GIAN</th>
+              <th className="w-[14%] py-3.5 px-4 whitespace-nowrap">TRẠNG THÁI</th>
+              <th className="w-[12%] py-3.5 px-4 text-right whitespace-nowrap">THAO TÁC</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#F5EFE6] text-xs">
+            {orders.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="py-10 text-center text-[#8A8175]">
+                  Không tìm thấy đơn hàng nào phù hợp với bộ lọc hiện tại.
+                </td>
+              </tr>
+            ) : (
+              orders.map((order) => {
+                const isPending = order.status === 'PENDING';
+                const isCooking = order.status === 'COOKING';
+                const isServed = order.status === 'SERVED';
+                const isCompleted = order.status === 'COMPLETED';
+
+                return (
+                  <tr key={order.id} className="hover:bg-[#FCFAF7] transition-colors">
+                    {/* Cột 1: Mã Đơn + Huy hiệu VIP */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-black text-[#8E2813] text-xs tracking-tight">
+                          {order.code}
+                        </span>
+                        {order.isVip && (
+                          <span className="px-1.5 py-0.2 rounded-md bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] text-[9px] font-black uppercase">
+                            VIP
+                          </span>
+                        )}
+                      </div>
+                    </td>
+
+                    {/* Cột 2: Bàn */}
+                    <td className="py-4 px-3 whitespace-nowrap">
+                      <span className="inline-block px-2.5 py-1 rounded-md bg-[#FAF7F2] text-[#3C342F] font-bold text-xs border border-[#EAE3D6]">
+                        {order.tableName}
+                      </span>
+                    </td>
+
+                    {/* Cột 3: Nhân viên phụ trách */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <span className="font-semibold text-[#3C342F] text-xs">
+                        {order.employeeName}
+                      </span>
+                    </td>
+
+                    {/* Cột 4: Tổng tiền */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <span className="font-black text-[#8E2813] text-xs">
+                        {order.formattedTotal}
+                      </span>
+                    </td>
+
+                    {/* Cột 5: Thời gian */}
+                    <td className="py-4 px-3 whitespace-nowrap">
+                      <div>
+                        <div className="font-bold text-[#26201E] text-xs">
+                          {order.time}
+                        </div>
+                        <div className="text-[10px] text-[#8A8175] flex items-center gap-1 mt-0.5">
+                          <Clock className="w-2.5 h-2.5 text-[#A89E92]" />
+                          <span>{order.relativeTime}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Cột 7: Trạng thái */}
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
+                          isPending
+                            ? 'bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]'
+                            : isCooking
+                            ? 'bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]'
+                            : isServed
+                            ? 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]'
+                            : isCompleted
+                            ? 'bg-[#F5EFE6] text-[#69635A] border-[#EAE3D6]'
+                            : 'bg-[#F3F4F6] text-[#9CA3AF] border-[#E5E7EB]'
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            isPending
+                              ? 'bg-[#DC2626]'
+                              : isCooking
+                              ? 'bg-[#D97706]'
+                              : isServed
+                              ? 'bg-[#10B981]'
+                              : isCompleted
+                              ? 'bg-[#8A8175]'
+                              : 'bg-[#9CA3AF]'
+                          }`}
+                        />
+                        <span>{order.statusText}</span>
+                      </span>
+                    </td>
+
+                    {/* Cột 8: Thao tác */}
+                    <td className="py-4 px-4 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center gap-1.5 justify-end">
+                        {/* Nút chính tương ứng trạng thái */}
+                        {isPending && onAcceptOrder && (
+                          <button
+                            type="button"
+                            onClick={() => onAcceptOrder(order.id)}
+                            className="px-2.5 py-1 bg-[#8E2813] hover:bg-[#73200F] text-white rounded-lg text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                          >
+                            Tiếp nhận
+                          </button>
+                        )}
+
+                        {isCooking && onServeOrder && (
+                          <button
+                            type="button"
+                            onClick={() => onServeOrder(order.id)}
+                            className="px-2.5 py-1 bg-[#059669] hover:bg-[#047857] text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <Check className="w-3 h-3" />
+                            <span>Ra món</span>
+                          </button>
+                        )}
+
+                        {(isServed || isCompleted) && onCompleteOrder && (
+                          <button
+                            type="button"
+                            onClick={() => onCompleteOrder(order.id)}
+                            className="px-2 py-1 border border-[#EAE3D6] bg-[#ECFDF5]/50 text-[#059669] hover:bg-[#ECFDF5] rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                          >
+                            <CheckCheck className="w-3 h-3" />
+                            <span>Hoàn tất</span>
+                          </button>
+                        )}
+
+                        {/* In hóa đơn */}
+                        {onPrintReceipt && (
+                          <button
+                            type="button"
+                            title="In hóa đơn"
+                            onClick={() => onPrintReceipt(order)}
+                            className="p-1.5 text-[#8A8175] hover:text-[#26201E] hover:bg-[#FAF7F2] rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Printer className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+
+                        {/* Xem chi tiết đơn hàng */}
+                        {onViewOrder && (
+                          <button
+                            type="button"
+                            title="Xem chi tiết đơn"
+                            onClick={() => onViewOrder(order)}
+                            className="p-1.5 text-[#8A8175] hover:text-[#26201E] hover:bg-[#FAF7F2] rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Phân trang chuẩn đặt ở đáy bảng */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        itemName="đơn hàng"
+        onPageChange={onPageChange}
+      />
+    </div>
+  );
+}

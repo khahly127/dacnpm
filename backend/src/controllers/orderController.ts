@@ -10,10 +10,14 @@ export const orderController = {
         } catch (error) { next(error); }
     },
     async getById(req: Request, res: Response, next: NextFunction) {
-        try { res.json({ success: true, data: await orderService.getById(req.params.id) }); } catch (error) { next(error); }
+        try {
+            res.json({ success: true, data: await orderService.getById(req.params.id) });
+        } catch (error) { next(error); }
     },
     async listByTable(req: Request, res: Response, next: NextFunction) {
-        try { res.json({ success: true, data: await orderService.listByTable(req.params.tableId) }); } catch (error) { next(error); }
+        try {
+            res.json({ success: true, data: await orderService.listByTable(req.params.tableId) });
+        } catch (error) { next(error); }
     },
     async listAll(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
@@ -22,6 +26,9 @@ export const orderController = {
         } catch (error) { next(error); }
     },
     async updateStatus(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-        try { res.json({ success: true, data: await orderService.updateStatus(req.params.id, req.body.trang_thai, req.user!.id) }); } catch (error) { next(error); }
+        try {
+            const employeeId = req.user?.id || 1;
+            res.json({ success: true, data: await orderService.updateStatus(req.params.id, req.body.trang_thai, employeeId) });
+        } catch (error) { next(error); }
     },
 };

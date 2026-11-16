@@ -1,0 +1,89 @@
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { DashboardData, TableItem, RecentOrder } from '@/types/dashboard';
+import { dashboardService } from '@/services/dashboardService';
+
+export type TableFilterType = 'all' | 'occupied' | 'available' | 'reserved';
+
+export function useDashboard() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [tableFilter, setTableFilter] = useState<TableFilterType>('all');
+  const [orderSearchQuery, setOrderSearchQuery] = useState<string>('');
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const res = await dashboardService.getDashboardData();
+        setData(res);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const handleRefreshShift = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      const refreshed = await dashboardService.refreshShift();
+      setData(refreshed);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  // Lọc bàn theo tab (Tất cả, Có khách, Bàn trống, Đặt trước)
+  const filteredTables = useMemo<TableItem[]>(() => {
+    if (!data) return [];
+    switch (tableFilter) {
+      case 'occupied':
+        return data.tables.filter((t) => t.status !== 'AVAILABLE' && t.status !== 'RESERVED');
+      case 'available':
+        return data.tables.filter((t) => t.status === 'AVAILABLE');
+      case 'reserved':
+        return data.tables.filter((t) => t.status === 'RESERVED');
+      default:
+        return data.tables;
+    }
+  }, [data, tableFilter]);
+
+  // Đếm số lượng theo trạng thái bàn
+  const tableCounts = useMemo(() => {
+    if (!data) return { all: 0, occupied: 0, available: 0, reserved: 0 };
+    return {
+      all: data.tables.length,
+      occupied: data.tables.filter((t) => t.status !== 'AVAILABLE' && t.status !== 'RESERVED').length,
+      available: data.tables.filter((t) => t.status === 'AVAILABLE').length,
+      reserved: data.tables.filter((t) => t.status === 'RESERVED').length,
+    };
+  }, [data]);
+
+  // Tìm kiếm đơn hàng theo mã đơn, tên bàn hoặc nhân viên
+  const filteredOrders = useMemo<RecentOrder[]>(() => {
+    if (!data) return [];
+    if (!orderSearchQuery.trim()) return data.recentOrders;
+    const q = orderSearchQuery.toLowerCase();
+    return data.recentOrders.filter(
+      (ord) =>
+        ord.code.toLowerCase().includes(q) ||
+        ord.tableName.toLowerCase().includes(q) ||
+        ord.waiterName.toLowerCase().includes(q)
+    );
+  }, [data, orderSearchQuery]);
+
+  return {
+    data,
+    loading,
+    isRefreshing,
+    tableFilter,
+    setTableFilter,
+    tableCounts,
+    filteredTables,
+    orderSearchQuery,
+    setOrderSearchQuery,
+    filteredOrders,
+    handleRefreshShift,
+  };
+}

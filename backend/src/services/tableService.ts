@@ -26,4 +26,7 @@ export const tableService = {
         if (!Object.keys(changes).length) throw new AppError('Khong co du lieu cap nhat hop le.', 400);
         return tableModel.update(getTableId(idValue), changes);
     },
+    async delete(idValue: unknown) {
+        return tableModel.delete(getTableId(idValue));
+    },
 };

@@ -25,8 +25,13 @@ export const authService = {
         const token = this.createToken({ id: employee.ma_nv, role: employee.vai_tro, username: employee.tai_khoan });
         return { token, user: { ma_nv: employee.ma_nv, ho_ten: employee.ho_ten, tai_khoan: employee.tai_khoan, vai_tro: employee.vai_tro } };
     },
-    async verifyPassword(password: string, passwordHash: string) {
-        return bcrypt.compare(password, passwordHash);
+    async verifyPassword(password: string, passwordHash: string): Promise<boolean> {
+        // 1. Neu mat khau trong DB da ma hoa Bcrypt
+        if (passwordHash && (passwordHash.startsWith('$2a$') || passwordHash.startsWith('$2b$') || passwordHash.startsWith('$2y$'))) {
+            return bcrypt.compare(password, passwordHash);
+        }
+        // 2. Neu mat khau trong DB la chu thuong (nhu 12345678 hien tai tren Supabase)
+        return password === passwordHash;
     },
 
     async hashPassword(password: string) {
