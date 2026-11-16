@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AppError } from '../utils/appError';
 import { UserRole } from '../types';
+import { employeeModel } from '../models/employeeModel';
 
 interface TokenPayload {
     id: number;
@@ -16,6 +17,14 @@ function getJwtSecret(): string {
 }
 
 export const authService = {
+    async login(taiKhoan: unknown, matKhau: unknown) {
+        if (typeof taiKhoan !== 'string' || typeof matKhau !== 'string') throw new AppError('Tai khoan va mat khau la bat buoc.', 400);
+        const employee = await employeeModel.findByUsername(taiKhoan);
+        const passwordIsValid = employee ? await this.verifyPassword(matKhau, employee.mat_khau) : false;
+        if (!employee || !passwordIsValid) throw new AppError('Tai khoan hoac mat khau khong dung.', 401);
+        const token = this.createToken({ id: employee.ma_nv, role: employee.vai_tro, username: employee.tai_khoan });
+        return { token, user: { ma_nv: employee.ma_nv, ho_ten: employee.ho_ten, tai_khoan: employee.tai_khoan, vai_tro: employee.vai_tro } };
+    },
     async verifyPassword(password: string, passwordHash: string) {
         return bcrypt.compare(password, passwordHash);
     },

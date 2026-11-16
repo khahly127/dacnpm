@@ -12,6 +12,17 @@ const parseId = (value: unknown, field: string) => {
 };
 
 export const orderService = {
+    async getById(idValue: unknown) {
+        const order = await orderModel.getById(parseId(idValue, 'Ma don'));
+        if (!order) throw new AppError('Khong tim thay don hang.', 404);
+        return order;
+    },
+    async listByTable(tableIdValue: unknown) {
+        return orderModel.listByTable(parseId(tableIdValue, 'Ma ban'));
+    },
+    async listAll(status?: string) {
+        return orderModel.listAll(status);
+    },
     async createOrder(tableIdValue: unknown, items: unknown) {
         const tableId = parseId(tableIdValue, 'Ma ban');
         if (!Array.isArray(items) || items.length === 0) throw new AppError('Don hang phai co it nhat mot mon.', 400);
