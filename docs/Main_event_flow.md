@@ -122,7 +122,7 @@ Quản lý trạng thái bàn: Theo dõi sơ đồ bàn (Bàn trống, Bàn đan
 
 Xử lý thanh toán: Nhận yêu cầu tính tiền từ khách, xác nhận đã nhận tiền (tiền mặt/VietQR) và đóng đơn hàng (hoàn tất).
 
-3. Quản lý (Admin)
+3. Admin
 Đặc điểm: Người có quyền hạn cao nhất trong hệ thống (Super User). Bao gồm toàn bộ quyền của Nhân viên cộng thêm các quyền quản trị, thiết lập hệ thống và xem báo cáo.
 
 Nhiệm vụ & Chức năng thực hiện:
