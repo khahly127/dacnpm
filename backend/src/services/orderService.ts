@@ -5,7 +5,11 @@ import { OrderItemInput, OrderStatus } from '../types';
 import { AppError } from '../utils/appError';
 
 const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-const parseId = (value: unknown, field: string) => { const result = Number(value); if (!Number.isInteger(result) || result <= 0) throw new AppError(`${field} khong hop le.`, 400); return result; };
+const parseId = (value: unknown, field: string) => {
+    const result = Number(value); if (!Number.isInteger(result) || result <= 0)
+        throw new AppError(`${field} khong hop le.`, 400);
+    return result;
+};
 
 export const orderService = {
     async createOrder(tableIdValue: unknown, items: unknown) {
@@ -16,15 +20,18 @@ export const orderService = {
         const validatedItems = items.map((item: OrderItemInput) => {
             const dishId = parseId(item?.ma_mon, 'Ma mon');
             const quantity = parseId(item?.so_luong, 'So luong');
-            if (item.ghi_chu !== undefined && typeof item.ghi_chu !== 'string') throw new AppError('Ghi chu khong hop le.', 400);
+            if (item.ghi_chu !== undefined && typeof item.ghi_chu !== 'string')
+                throw new AppError('Ghi chu khong hop le.', 400);
             return { dishId, quantity, note: item.ghi_chu?.trim() || null };
         });
         const dishes = await menuModel.getDishesByIds([...new Set(validatedItems.map(item => item.dishId))]);
-        if (dishes.length !== new Set(validatedItems.map(item => item.dishId)).size) throw new AppError('Mot hoac nhieu mon an khong ton tai.', 400);
+        if (dishes.length !== new Set(validatedItems.map(item => item.dishId)).size)
+            throw new AppError('Mot hoac nhieu mon an khong ton tai.', 400);
         const dishMap = new Map(dishes.map(dish => [dish.ma_mon, dish]));
         for (const item of validatedItems) {
             const dish = dishMap.get(item.dishId);
-            if (!dish || normalize(dish.trang_thai) !== 'con mon') throw new AppError(`Mon ${dish?.ten_mon ?? item.dishId} da het.`, 400);
+            if (!dish || normalize(dish.trang_thai) !== 'con mon')
+                throw new AppError(`Mon ${dish?.ten_mon ?? item.dishId} da het.`, 400);
         }
         const total = validatedItems.reduce((sum, item) => sum + Number(dishMap.get(item.dishId)!.gia) * item.quantity, 0);
         const order = await orderModel.createOrder({ ma_ban: tableId, tong_tien: total, trang_thai: 'Cho xac nhan' });

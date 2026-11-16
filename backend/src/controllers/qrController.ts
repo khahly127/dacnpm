@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { qrService } from '../services/qrService';
 
 export const qrController = {
-    async generateAndSaveQR(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async generateAndSaveQR(req: Request, res: Response, next: NextFunction) {
         try {
             const tableId = Number(req.params.maBan);
             const baseUrl = `${req.protocol}://${req.get('host')}`;

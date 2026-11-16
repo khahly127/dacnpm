@@ -1,6 +1,6 @@
 import QRCode from 'qrcode';
 
-export async function generateTableQRCode(maBan: number, baseUrl: string): Promise<string> {
+export async function generateTableQRCode(maBan: number, baseUrl: string) {
     try {
         const targetUrl = `${baseUrl}/menu?table=${maBan}`;
 

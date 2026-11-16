@@ -16,11 +16,11 @@ function getJwtSecret(): string {
 }
 
 export const authService = {
-    async verifyPassword(password: string, passwordHash: string): Promise<boolean> {
+    async verifyPassword(password: string, passwordHash: string) {
         return bcrypt.compare(password, passwordHash);
     },
 
-    async hashPassword(password: string): Promise<string> {
+    async hashPassword(password: string) {
         return bcrypt.hash(password, 12);
     },
 
