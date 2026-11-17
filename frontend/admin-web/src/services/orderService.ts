@@ -89,10 +89,10 @@ export const orderService = {
           const mappedDbOrders: OrderItem[] = dbOrders.map((item) => {
             const { status, statusText } = mapBackendStatus(item.trang_thai);
             const total = item.tong_tien || 0;
-            const formattedTotal = `${new Intl.NumberFormat('vi-VN').format(total)} đ`;
+            const formattedTotal = `${new Intl.NumberFormat('vi-VN').format(total)} VNĐ`;
             const code = `#DH${String(item.ma_don).padStart(3, '0')}`;
             const tableName = item.ban?.ten_ban || `Bàn ${String(item.ma_ban).padStart(2, '0')}`;
-            const employeeName = item.nhanvien?.ho_ten || 'NV-01 Tuấn Anh';
+            const employeeName = item.nhanvien?.ho_ten || 'Chưa phân công';
 
             const items: OrderItem['items'] = (item.chitietdonhang || []).map((ct, idx) => ({
               id: ct.ma_ct || idx + 1,
@@ -100,7 +100,7 @@ export const orderService = {
               dishName: ct.monan?.ten_mon || `Món ăn #${ct.ma_mon}`,
               quantity: ct.so_luong || 1,
               price: ct.don_gia || 0,
-              formattedPrice: `${new Intl.NumberFormat('vi-VN').format(ct.don_gia || 0)} đ`,
+              formattedPrice: `${new Intl.NumberFormat('vi-VN').format(ct.don_gia || 0)} VNĐ`,
               note: ct.ghi_chu,
             }));
 
@@ -164,7 +164,7 @@ export const orderService = {
       const resJson = await response.json();
       return { success: response.ok && resJson.success, message: resJson.message };
     } catch {
-      return { success: true };
+      return { success: false, message: 'Không thể kết nối đến máy chủ.' };
     }
   },
 

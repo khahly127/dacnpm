@@ -36,17 +36,21 @@ export function useDish() {
 
   // Quản lý Modal Xóa
   const [deletingDish, setDeletingDish] = useState<DishItem | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Tải danh sách món ăn & danh mục từ Backend
   const loadData = useCallback(() => {
     setLoading(true);
+    setError(null);
     Promise.all([dishService.getDishList(), dishService.getCategories()])
       .then(([dishes, cats]) => {
         setDishList(dishes);
         setCategories(cats);
       })
-      .catch(() => {
-        // Fallback an toàn
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'Không thể kết nối đến máy chủ Backend.';
+        setError(msg);
+        setDishList([]);
       })
       .finally(() => {
         setLoading(false);
@@ -55,6 +59,7 @@ export function useDish() {
 
   useEffect(() => {
     let ignore = false;
+    setError(null);
     Promise.all([dishService.getDishList(), dishService.getCategories()])
       .then(([dishes, cats]) => {
         if (!ignore) {
@@ -63,8 +68,11 @@ export function useDish() {
           setLoading(false);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!ignore) {
+          const msg = err instanceof Error ? err.message : 'Không thể kết nối đến máy chủ Backend.';
+          setError(msg);
+          setDishList([]);
           setLoading(false);
         }
       });
@@ -285,6 +293,7 @@ export function useDish() {
     currentPage: safeCurrentPage,
     setCurrentPage,
     loading,
+    error,
     filters,
     setFilters: updateFilters,
     toggleStatus,

@@ -32,17 +32,21 @@ export function useCategory() {
 
   // Quản lý Modal Xác nhận Xóa
   const [deletingCategory, setDeletingCategory] = useState<CategoryItem | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Tải danh sách danh mục từ Backend
   const loadCategories = useCallback(() => {
     setLoading(true);
+    setError(null);
     categoryService
       .getCategoryList()
       .then((data) => {
         setCategoryList(data);
       })
-      .catch(() => {
-        // Fallback an toàn
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : 'Không thể kết nối đến máy chủ Backend.';
+        setError(msg);
+        setCategoryList([]);
       })
       .finally(() => {
         setLoading(false);
@@ -51,6 +55,7 @@ export function useCategory() {
 
   useEffect(() => {
     let ignore = false;
+    setError(null);
     categoryService
       .getCategoryList()
       .then((data) => {
@@ -59,8 +64,11 @@ export function useCategory() {
           setLoading(false);
         }
       })
-      .catch(() => {
+      .catch((err: unknown) => {
         if (!ignore) {
+          const msg = err instanceof Error ? err.message : 'Không thể kết nối đến máy chủ Backend.';
+          setError(msg);
+          setCategoryList([]);
           setLoading(false);
         }
       });
@@ -225,6 +233,7 @@ export function useCategory() {
     currentPage: safeCurrentPage,
     setCurrentPage,
     loading,
+    error,
     filters,
     setFilters: updateFilters,
     toggleStatus,

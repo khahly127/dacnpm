@@ -59,6 +59,7 @@ export default function CategoryPage() {
     currentPage,
     setCurrentPage,
     loading,
+    error,
     filters,
     setFilters,
     toggleStatus,
@@ -162,6 +163,25 @@ export default function CategoryPage() {
           {loading ? (
             <div className="bg-white rounded-2xl border border-[#EAE3D6] p-12 text-center text-sm font-semibold text-[#8E2813]">
               Đang tải danh mục thực đơn Casa Cozy từ CSDL...
+            </div>
+          ) : error ? (
+            <div className="bg-white rounded-2xl border border-red-200 p-10 text-center shadow-sm">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-red-50 text-[#C23924] flex items-center justify-center mb-3">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <h3 className="text-sm font-bold text-[#26201E] mb-1">
+                Không thể kết nối đến máy chủ Backend
+              </h3>
+              <p className="text-xs text-[#8A8175] max-w-md mx-auto mb-4 leading-relaxed">
+                {error} Vui lòng kiểm tra lại dịch vụ Backend đang chạy trên cổng 5000.
+              </p>
+              <button
+                type="button"
+                onClick={refreshCategories}
+                className="px-4 py-2 bg-[#8E2813] hover:bg-[#77210e] text-white text-xs font-bold rounded-xl shadow active:scale-95 transition"
+              >
+                Thử kết nối lại
+              </button>
             </div>
           ) : (
             <CategoryTable

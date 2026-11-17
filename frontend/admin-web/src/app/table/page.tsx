@@ -106,27 +106,54 @@ export default function TablePage() {
   };
 
   const onSubmitCreate = async (input: CreateTableInput) => {
-    await handleCreateTable(input);
-    setToastMessage({
-      type: 'success',
-      text: `Đã thêm bàn mới "${input.name}" thành công!`,
-    });
+    try {
+      await handleCreateTable(input);
+      setToastMessage({
+        type: 'success',
+        text: `Đã thêm bàn mới "${input.name}" thành công!`,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Không thể tạo bàn mới.';
+      setToastMessage({
+        type: 'error',
+        text: msg,
+      });
+      throw err;
+    }
   };
 
   const onSubmitUpdate = async (id: string, input: UpdateTableInput) => {
-    await handleUpdateTable(id, input);
-    setToastMessage({
-      type: 'success',
-      text: `Cập nhật thông tin bàn thành công!`,
-    });
+    try {
+      await handleUpdateTable(id, input);
+      setToastMessage({
+        type: 'success',
+        text: `Cập nhật thông tin bàn thành công!`,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Không thể cập nhật thông tin bàn.';
+      setToastMessage({
+        type: 'error',
+        text: msg,
+      });
+      throw err;
+    }
   };
 
   const onConfirmDelete = async (id: string) => {
-    await handleDeleteTable(id);
-    setToastMessage({
-      type: 'success',
-      text: `Đã xóa bàn ăn khỏi hệ thống!`,
-    });
+    try {
+      await handleDeleteTable(id);
+      setToastMessage({
+        type: 'success',
+        text: `Đã xóa bàn ăn khỏi hệ thống!`,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Không thể xóa bàn ăn.';
+      setToastMessage({
+        type: 'error',
+        text: msg,
+      });
+      throw err;
+    }
   };
 
   const onToggleQrWithToast = async (id: string) => {

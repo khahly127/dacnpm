@@ -1,5 +1,5 @@
 export function formatVND(amount: number): string {
-  return new Intl.NumberFormat('vi-VN').format(amount) + ' đ';
+  return new Intl.NumberFormat('vi-VN').format(amount) + ' VNĐ';
 }
 
 export function formatTimeAgo(minutes: number): string {

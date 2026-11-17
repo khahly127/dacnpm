@@ -27,6 +27,11 @@ export const tableService = {
         return tableModel.update(getTableId(idValue), changes);
     },
     async delete(idValue: unknown) {
-        return tableModel.delete(getTableId(idValue));
+        const tableId = getTableId(idValue);
+        const hasActive = await tableModel.hasActiveOrders(tableId);
+        if (hasActive) {
+            throw new AppError('Bàn đang có đơn hàng chưa hoàn tất, không thể xóa!', 400);
+        }
+        return tableModel.delete(tableId);
     },
 };

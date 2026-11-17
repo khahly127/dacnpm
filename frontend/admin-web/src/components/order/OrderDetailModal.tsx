@@ -112,10 +112,10 @@ export function OrderDetailModal({
                         {item.quantity}
                       </td>
                       <td className="py-2.5 px-3 text-right text-[#524B46]">
-                        {new Intl.NumberFormat('vi-VN').format(item.price)} đ
+                        {new Intl.NumberFormat('vi-VN').format(item.price)} VNĐ
                       </td>
                       <td className="py-2.5 px-3 text-right font-bold text-[#26201E]">
-                        {new Intl.NumberFormat('vi-VN').format(item.price * item.quantity)} đ
+                        {new Intl.NumberFormat('vi-VN').format(item.price * item.quantity)} VNĐ
                       </td>
                     </tr>
                   ))}

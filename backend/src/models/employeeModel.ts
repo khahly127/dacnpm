@@ -17,7 +17,9 @@ export const employeeModel = {
     },
 
     async create(input: { ho_ten: string; tai_khoan: string; mat_khau: string; vai_tro: UserRole }) {
-        const { data, error } = await supabase.from('nhanvien').insert(input).select(publicFields).single();
+        const { data: maxRow } = await supabase.from('nhanvien').select('ma_nv').order('ma_nv', { ascending: false }).limit(1).maybeSingle();
+        const payload = { ...input, ma_nv: (maxRow?.ma_nv || 0) + 1 };
+        const { data, error } = await supabase.from('nhanvien').insert(payload).select(publicFields).single();
         if (error) throw new Error(error.message);
         return data;
     },
