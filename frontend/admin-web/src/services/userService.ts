@@ -35,65 +35,29 @@ export const userService = {
   async getUserList(): Promise<UserItem[]> {
     try {
       const token = authService.getToken();
-
-      // 1. Gọi Backend API lấy dữ liệu thật từ bảng 'nhanvien' trong Supabase
-      if (token) {
-        const response = await fetch(`${API_BASE_URL}/employees`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          const resJson = await response.json();
-          if (resJson.success && Array.isArray(resJson.data)) {
-            const dbEmployees = resJson.data as BackendEmployee[];
-            return dbEmployees.map((emp, index) => mapBackendToUserItem(emp, index));
-          }
-        }
+      if (!token) {
+        return [];
       }
 
-      // 2. Dự phòng an toàn: Sử dụng tài khoản thật hiện tại đang đăng nhập từ Supabase
-      const currentUser = authService.getCurrentUser();
-      if (currentUser) {
-        const isAdmin = currentUser.role === 'ADMIN';
-        return [
-          {
-            id: currentUser.id || '1',
-            code: `#${currentUser.employeeCode || 'NV-01'}`,
-            name: currentUser.name || 'Nguyễn Văn An',
-            email: currentUser.email || 'admin@gmail.com',
-            username: currentUser.email || 'admin@gmail.com',
-            phone: '',
-            role: currentUser.role,
-            roleText: isAdmin ? 'Quản trị viên' : 'Quản lý',
-            status: 'ACTIVE',
-            isFixed: false,
-          },
-        ];
+      const response = await fetch(`${API_BASE_URL}/employees`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return [];
+      }
+
+      const resJson = await response.json();
+      if (resJson.success && Array.isArray(resJson.data)) {
+        const dbEmployees = resJson.data as BackendEmployee[];
+        return dbEmployees.map((emp, index) => mapBackendToUserItem(emp, index));
       }
 
       return [];
     } catch {
-      const currentUser = authService.getCurrentUser();
-      if (currentUser) {
-        const isAdmin = currentUser.role === 'ADMIN';
-        return [
-          {
-            id: currentUser.id || '1',
-            code: `#${currentUser.employeeCode || 'NV-01'}`,
-            name: currentUser.name || 'Nguyễn Văn An',
-            email: currentUser.email || 'admin@gmail.com',
-            username: currentUser.email || 'admin@gmail.com',
-            phone: '',
-            role: currentUser.role,
-            roleText: isAdmin ? 'Quản trị viên' : 'Quản lý',
-            status: 'ACTIVE',
-            isFixed: false,
-          },
-        ];
-      }
       return [];
     }
   },

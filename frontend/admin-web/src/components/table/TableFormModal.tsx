@@ -29,12 +29,17 @@ function TableFormInner({
   const [status, setStatus] = useState<TableStatus>(table ? table.status : 'available');
   const [note, setNote] = useState(table?.reservedInfo?.note || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim()) {
+      setErrorMessage('Vui lòng nhập tên bàn.');
+      return;
+    }
 
     setIsSubmitting(true);
+    setErrorMessage(null);
     try {
       if (isEdit && table) {
         await onSubmitUpdate(table.id, {
@@ -55,6 +60,10 @@ function TableFormInner({
           note,
         });
       }
+      onClose();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Thao tác không thành công.';
+      setErrorMessage(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -90,6 +99,11 @@ function TableFormInner({
         {/* Form Body */}
         <form onSubmit={handleSubmit}>
           <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            {errorMessage && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-medium">
+                {errorMessage}
+              </div>
+            )}
             {/* Tên bàn */}
             <div>
               <label className="block text-xs font-bold text-[#2D241E] mb-1.5">

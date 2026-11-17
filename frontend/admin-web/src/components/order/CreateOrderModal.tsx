@@ -159,7 +159,7 @@ function CreateOrderContent({
                   >
                     {SAMPLE_DISH_OPTIONS.map((d) => (
                       <option key={d.id} value={d.id}>
-                        {d.name} ({new Intl.NumberFormat('vi-VN').format(d.price)} đ)
+                        {d.name} ({new Intl.NumberFormat('vi-VN').format(d.price)} VNĐ)
                       </option>
                     ))}
                   </select>

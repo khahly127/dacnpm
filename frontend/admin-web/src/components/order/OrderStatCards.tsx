@@ -44,10 +44,8 @@ export function OrderStatCards({ stats }: OrderStatCardsProps) {
             </span>
             <span className="w-2 h-2 rounded-full bg-[#DC2626] animate-pulse" />
           </div>
-          <div className="mt-1.5">
-            <span className="inline-block px-2 py-0.5 rounded-md bg-[#FEF2F2] border border-[#FECACA] text-[10px] font-bold text-[#DC2626]">
-              Cần xử lý ngay
-            </span>
+          <div className="text-[11px] font-bold text-[#DC2626] mt-1.5">
+            Cần xử lý ngay
           </div>
         </div>
         <div className="w-12 h-12 rounded-2xl bg-[#FEF2F2] border border-[#FECACA] flex items-center justify-center text-[#DC2626] shadow-xs shrink-0">
@@ -66,7 +64,7 @@ export function OrderStatCards({ stats }: OrderStatCardsProps) {
             <span className="text-xs font-normal text-[#8A8175]">đơn</span>
           </div>
           <div className="text-[11px] font-medium text-[#8A8175] mt-1.5">
-            Bếp & Bar đang ra món
+            Bếp đang ra món
           </div>
         </div>
         <div className="w-12 h-12 rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] flex items-center justify-center text-[#D97706] shadow-xs shrink-0">

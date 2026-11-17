@@ -19,6 +19,42 @@ interface OrderTableProps {
   onViewOrder?: (order: OrderItem) => void;
 }
 
+function formatOrderDateTime(createdAt?: string, fallbackTime?: string) {
+  if (!createdAt) {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    return {
+      date: `${day}/${month}/${year}`,
+      time: fallbackTime || '00:00',
+    };
+  }
+
+  const d = new Date(createdAt);
+  if (isNaN(d.getTime())) {
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    return {
+      date: `${day}/${month}/${year}`,
+      time: fallbackTime || '00:00',
+    };
+  }
+
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+
+  return {
+    date: `${day}/${month}/${year}`,
+    time: `${hours}:${minutes}`,
+  };
+}
+
 export function OrderTable({
   orders,
   currentPage,
@@ -35,16 +71,16 @@ export function OrderTable({
   return (
     <div className="bg-white rounded-2xl border border-[#EAE3D6] shadow-2xs overflow-hidden flex flex-col">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse table-fixed min-w-[840px]">
+        <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-[#F0EAE1] text-[11px] font-black text-[#8A8175] uppercase tracking-wider bg-[#FAF7F2]">
-              <th className="w-[14%] py-3.5 px-4 whitespace-nowrap">MÃ ĐƠN</th>
-              <th className="w-[12%] py-3.5 px-3 whitespace-nowrap">BÀN</th>
-              <th className="w-[18%] py-3.5 px-4 whitespace-nowrap">NHÂN VIÊN</th>
-              <th className="w-[16%] py-3.5 px-4 whitespace-nowrap">TỔNG TIỀN</th>
-              <th className="w-[14%] py-3.5 px-3 whitespace-nowrap">THỜI GIAN</th>
-              <th className="w-[14%] py-3.5 px-4 whitespace-nowrap">TRẠNG THÁI</th>
-              <th className="w-[12%] py-3.5 px-4 text-right whitespace-nowrap">THAO TÁC</th>
+              <th className="w-[11%] py-3.5 px-4 whitespace-nowrap">MÃ ĐƠN</th>
+              <th className="w-[9%] py-3.5 px-4 whitespace-nowrap">BÀN</th>
+              <th className="w-[16%] py-3.5 px-4 whitespace-nowrap">NHÂN VIÊN</th>
+              <th className="w-[15%] py-3.5 px-4 whitespace-nowrap">TỔNG TIỀN</th>
+              <th className="w-[14%] py-3.5 px-4 whitespace-nowrap">THỜI GIAN</th>
+              <th className="w-[16%] py-3.5 px-4 whitespace-nowrap">TRẠNG THÁI</th>
+              <th className="w-[19%] py-3.5 px-4 text-right whitespace-nowrap">THAO TÁC</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#F5EFE6] text-xs">
@@ -78,8 +114,8 @@ export function OrderTable({
                     </td>
 
                     {/* Cột 2: Bàn */}
-                    <td className="py-4 px-3 whitespace-nowrap">
-                      <span className="inline-block px-2.5 py-1 rounded-md bg-[#FAF7F2] text-[#3C342F] font-bold text-xs border border-[#EAE3D6]">
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      <span className="font-bold text-[#26201E] text-xs">
                         {order.tableName}
                       </span>
                     </td>
@@ -99,16 +135,23 @@ export function OrderTable({
                     </td>
 
                     {/* Cột 5: Thời gian */}
-                    <td className="py-4 px-3 whitespace-nowrap">
-                      <div>
-                        <div className="font-bold text-[#26201E] text-xs">
-                          {order.time}
-                        </div>
-                        <div className="text-[10px] text-[#8A8175] flex items-center gap-1 mt-0.5">
-                          <Clock className="w-2.5 h-2.5 text-[#A89E92]" />
-                          <span>{order.relativeTime}</span>
-                        </div>
-                      </div>
+                    <td className="py-4 px-4 whitespace-nowrap">
+                      {(() => {
+                        const { date, time } = formatOrderDateTime(order.createdAt, order.time);
+                        return (
+                          <div>
+                            {/* Dòng 1: Ngày */}
+                            <div className="font-bold text-[#26201E] text-xs">
+                              {date}
+                            </div>
+                            {/* Dòng 2: Giờ */}
+                            <div className="text-[11px] text-[#8A8175] flex items-center gap-1 mt-0.5 font-medium">
+                              <Clock className="w-3 h-3 text-[#A89E92]" />
+                              <span>{time}</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </td>
 
                     {/* Cột 7: Trạng thái */}

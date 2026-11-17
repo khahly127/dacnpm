@@ -1,335 +1,261 @@
-import { DashboardData } from '@/types/dashboard';
+import { DashboardData, TableItem, RecentOrder, BestSellingDish, MetricCard, TableStatus, OrderStatus } from '@/types/dashboard';
+import { authService } from './authService';
 
-export const mockDashboardData: DashboardData = {
-  metrics: [
-    {
-      id: 'rev',
-      title: 'Tổng Doanh Thu Trong Ngày',
-      value: '18.520.000 VNĐ',
-      numberValue: '18.520.000',
-      unit: 'VNĐ',
-      comparisonText: '+12.5% so với hôm qua',
-      isPositive: true,
-      type: 'revenue',
-    },
-    {
-      id: 'orders',
-      title: 'Lượt Phục Vụ & Hóa Đơn',
-      value: '78 hóa đơn',
-      numberValue: '78',
-      unit: 'hóa đơn',
-      comparisonText: '+8.3% so với hôm qua',
-      isPositive: true,
-      type: 'orders',
-    },
-    {
-      id: 'aov',
-      title: 'Giá Trị Đơn Trung Bình (AOV)',
-      value: '237.000 VNĐ/đơn',
-      numberValue: '237.000',
-      unit: 'VNĐ/đơn',
-      comparisonText: '+15.000 đ so với mục tiêu',
-      isPositive: true,
-      type: 'aov',
-    },
-    {
-      id: 'occupancy',
-      title: 'Bàn Đang Phục Vụ',
-      value: '5 /12 bàn',
-      numberValue: '5',
-      unit: '/12 bàn',
-      comparisonText: 'Tỷ lệ lấp đầy: 41.7%',
-      isPositive: true,
-      type: 'occupancy',
-      extraInfo: {
-        totalTables: 12,
-        activeTables: 5,
-        occupancyRate: 41.7,
-      },
-    },
-  ],
-  tables: [
-    {
-      id: 't1',
-      code: 'Bàn 01',
-      status: 'AVAILABLE',
-      statusText: 'Sẵn sàng',
-      capacityText: 'Trống (4 chỗ)',
-      detailNote: 'Bàn sạch sẽ',
-    },
-    {
-      id: 't2',
-      code: 'Bàn 02',
-      status: 'SERVING',
-      statusText: 'Có phục vụ',
-      capacityText: '2 món • 2 khách',
-      detailNote: 'Thời gian: 25 phút',
-      subAmount: 'Tạm tính: 230.000 VNĐ',
-    },
-    {
-      id: 't3',
-      code: 'Bàn 03',
-      status: 'AVAILABLE',
-      statusText: 'Sẵn sàng',
-      capacityText: 'Trống (2 chỗ)',
-      detailNote: 'Bàn sạch sẽ',
-    },
-    {
-      id: 't4',
-      code: 'Bàn 04',
-      status: 'AVAILABLE',
-      statusText: 'Sẵn sàng',
-      capacityText: 'Trống (4 chỗ)',
-      detailNote: 'Bàn sạch sẽ',
-    },
-    {
-      id: 't5',
-      code: 'Bàn 05',
-      status: 'SERVING',
-      statusText: 'Đang lên món',
-      capacityText: '4 món • 2 khách',
-      detailNote: 'Ngồi: 35 phút',
-      subAmount: 'Tạm tính: 561.600 VNĐ',
-      hasAlert: true,
-    },
-    {
-      id: 't6',
-      code: 'Bàn 06',
-      status: 'AVAILABLE',
-      statusText: 'Sẵn sàng',
-      capacityText: 'Trống (6 chỗ)',
-      detailNote: 'Bàn sạch sẽ',
-    },
-    {
-      id: 't7',
-      code: 'Bàn 07',
-      status: 'WAITING_KITCHEN',
-      statusText: 'Chờ bếp',
-      capacityText: '3 món • 3 khách',
-      detailNote: 'Thời gian: 8 phút',
-      subAmount: 'Tạm tính: 415.000 VNĐ',
-    },
-    {
-      id: 't8',
-      code: 'Bàn 08',
-      status: 'EATING',
-      statusText: 'Đang dùng bữa',
-      capacityText: '3 món • 4 khách',
-      detailNote: 'Thời gian: 40 phút',
-      subAmount: 'Tạm tính: 385.000 VNĐ',
-    },
-    {
-      id: 't9',
-      code: 'Bàn 09',
-      status: 'COOKING',
-      statusText: 'Đang làm',
-      capacityText: '5 món • 4 khách',
-      detailNote: 'Tạm tính:',
-      subAmount: 'Tạm tính: 780.000 VNĐ',
-    },
-    {
-      id: 't10',
-      code: 'Bàn 10',
-      status: 'SERVED',
-      statusText: 'Đã ra món',
-      capacityText: '2 món • 2 khách',
-      detailNote: 'Thời gian: 20 phút',
-      subAmount: 'Tạm tính: 195.000 VNĐ',
-    },
-    {
-      id: 't11',
-      code: 'Bàn 11',
-      status: 'RESERVED',
-      statusText: 'Đặt trước',
-      capacityText: '19h30 • 6 khách',
-      detailNote: 'Khách quen VIP',
-    },
-    {
-      id: 't12',
-      code: 'Bàn 12',
-      status: 'AVAILABLE',
-      statusText: 'Sẵn sàng',
-      capacityText: 'Trống (8 chỗ)',
-      detailNote: 'Bàn tiệc lớn',
-    },
-  ],
-  topDishes: [
-    {
-      rank: 1,
-      name: 'Bò Bít Tết Wagyu Thượng Hạng',
-      soldCount: 42,
-      pricePerPortion: '320k/phần',
-      totalRevenue: '13.440.000 VNĐ',
-      percentage: 95,
-    },
-    {
-      rank: 2,
-      name: 'Mỳ Ý Tươi Hải Sản Trúc Đen',
-      soldCount: 36,
-      pricePerPortion: '135k/phần',
-      totalRevenue: '4.860.000 VNĐ',
-      percentage: 65,
-    },
-    {
-      rank: 3,
-      name: 'Cá Hồi Na Uy Áp Chảo Sốt Bơ Chanh',
-      soldCount: 28,
-      pricePerPortion: '240k/phần',
-      totalRevenue: '6.720.000 VNĐ',
-      percentage: 75,
-    },
-    {
-      rank: 4,
-      name: 'Salad Ức Vịt Xông Khói & Feta',
-      soldCount: 24,
-      pricePerPortion: '120k/phần',
-      totalRevenue: '2.880.000 VNĐ',
-      percentage: 40,
-    },
-    {
-      rank: 5,
-      name: 'Trà Đào Cam Sả & Vang House',
-      soldCount: 58,
-      pricePerPortion: '80k/ly',
-      totalRevenue: '4.640.000 VNĐ',
-      percentage: 55,
-    },
-  ],
-  recentOrders: [
-    {
-      id: 'ord-102',
-      code: '#DH102',
-      tableNumber: '05',
-      tableName: 'Bàn 05',
-      waiterId: 'NV-01',
-      waiterName: 'Tuấn Anh',
-      time: '19:42',
-      timeAgo: '10p trước',
-      itemsSummary: '1x Bò Wagyu, 1x Mỳ Ý Trúc Đen, 2x Vang Đỏ & Trà',
-      note: 'Ghi chú: Steak Medium',
-      totalAmount: '561.600 VNĐ',
-      status: 'COOKING',
-      statusText: 'Đang nấu',
-    },
-    {
-      id: 'ord-101',
-      code: '#DH101',
-      tableNumber: '02',
-      tableName: 'Bàn 02',
-      waiterId: 'NV-03',
-      waiterName: 'Lan Hương',
-      time: '19:35',
-      timeAgo: '17p trước',
-      itemsSummary: '1x Combo Lunch Set Bistro, 1x Cà phê kem béo',
-      note: 'Phục vụ kèm món tráng miệng',
-      totalAmount: '230.000 VNĐ',
-      status: 'SERVED',
-      statusText: 'Đã lên món',
-    },
-    {
-      id: 'ord-100',
-      code: '#DH100',
-      tableNumber: '07',
-      tableName: 'Bàn 07',
-      waiterId: 'NV-02',
-      waiterName: 'Hoàng Minh',
-      time: '19:28',
-      timeAgo: '24p trước',
-      itemsSummary: '1x Salad Vịt Khói, 2x Mocktail Berry Fizz',
-      note: 'Ghi chú: Đang chuyển order cho Bar',
-      totalAmount: '415.000 VNĐ',
-      status: 'WAITING_KITCHEN',
-      statusText: 'Chờ bếp',
-    },
-    {
-      id: 'ord-099',
-      code: '#DH099',
-      tableNumber: '09',
-      tableName: 'Bàn 09',
-      waiterId: 'NV-01',
-      waiterName: 'Tuấn Anh',
-      time: '19:15',
-      timeAgo: '37p trước',
-      itemsSummary: '2x Ribeye Steak, 1x Súp bí đỏ nướng, 2x Vang đỏ',
-      note: 'Ghi chú: Bếp chính đang nướng • Medium Rare',
-      totalAmount: '780.000 VNĐ',
-      status: 'COOKING',
-      statusText: 'Đang nấu',
-    },
-    {
-      id: 'ord-098',
-      code: '#DH098',
-      tableNumber: '08',
-      tableName: 'Bàn 08',
-      waiterId: 'NV-04',
-      waiterName: 'Khánh Vy',
-      time: '19:02',
-      timeAgo: '50p trước',
-      itemsSummary: '1x Cá hồi NaUy, 1x Mỳ Ý nấm truffle, 2x Soda',
-      note: 'Ghi chú: Khách đang tráng miệng',
-      totalAmount: '465.000 VNĐ',
-      status: 'SERVED',
-      statusText: 'Đã lên món',
-    },
-    {
-      id: 'ord-097',
-      code: '#DH097',
-      tableNumber: '10',
-      tableName: 'Bàn 10',
-      waiterId: 'NV-02',
-      waiterName: 'Hoàng Minh',
-      time: '18:50',
-      timeAgo: '1h 02p trước',
-      itemsSummary: '1x Ức Vịt Nướng Sốt Cam, 1x Khoai tây nghiền Truffle',
-      note: 'Ghi chú: Ít muối, sốt riêng',
-      totalAmount: '395.000 VNĐ',
-      status: 'SERVED',
-      statusText: 'Đã lên món',
-    },
-    {
-      id: 'ord-096',
-      code: '#DH096',
-      tableNumber: '03',
-      tableName: 'Bàn 03',
-      waiterId: 'NV-03',
-      waiterName: 'Lan Hương',
-      time: '18:38',
-      timeAgo: '1h 14p trước',
-      itemsSummary: '2x Mỳ Ý Tôm Sốt Pesto, 2x Nước ép bưởi hồng',
-      note: 'Ghi chú: Không hành tây, ưu tiên làm sớm',
-      totalAmount: '340.000 VNĐ',
-      status: 'WAITING_KITCHEN',
-      statusText: 'Chờ bếp',
-    },
-  ],
-};
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+interface BackendTable {
+  ma_ban: number;
+  ten_ban: string;
+  trang_thai: string;
+  don_hang_hien_tai?: {
+    ma_don: number;
+    so_mon: number;
+    thoi_gian_tao: string;
+    tong_tien: number;
+    trang_thai: string;
+  } | null;
+}
+
+interface BackendOrderDetail {
+  ma_ct?: number;
+  ma_mon: number;
+  so_luong: number;
+  don_gia: number;
+  monan?: {
+    ma_mon: number;
+    ten_mon: string;
+  };
+}
+
+interface BackendOrder {
+  ma_don: number;
+  ma_ban: number;
+  ma_nv?: number | null;
+  tong_tien: number;
+  trang_thai: string;
+  thoi_gian_tao: string;
+  ban?: { ma_ban: number; ten_ban: string };
+  nhanvien?: { ma_nv: number; ho_ten: string };
+  chitietdonhang?: BackendOrderDetail[];
+}
+
+function mapTableStatus(rawStatus?: string, hasActiveOrder?: boolean): { status: TableStatus; statusText: string } {
+  if (hasActiveOrder) {
+    return { status: 'SERVING', statusText: 'Đang phục vụ' };
+  }
+  if (!rawStatus) return { status: 'AVAILABLE', statusText: 'Sẵn sàng' };
+  const s = rawStatus.toLowerCase();
+  if (s.includes('phuc vu') || s.includes('khach')) {
+    return { status: 'SERVING', statusText: 'Có phục vụ' };
+  }
+  if (s.includes('dat') || s.includes('reserve')) {
+    return { status: 'RESERVED', statusText: 'Đặt trước' };
+  }
+  return { status: 'AVAILABLE', statusText: 'Sẵn sàng' };
+}
+
+function mapOrderStatus(rawStatus?: string): { status: OrderStatus; statusText: string } {
+  if (!rawStatus) return { status: 'WAITING_KITCHEN', statusText: 'Chờ bếp' };
+  const s = rawStatus.toLowerCase();
+  if (s.includes('chuan bi') || s.includes('cooking') || s.includes('nau') || s.includes('che bien')) {
+    return { status: 'COOKING', statusText: 'Đang nấu' };
+  }
+  if (s.includes('phuc vu') || s.includes('len mon') || s.includes('ra mon') || s.includes('hoan tat')) {
+    return { status: 'SERVED', statusText: 'Đã lên món' };
+  }
+  if (s.includes('huy') || s.includes('cancel')) {
+    return { status: 'CANCELLED', statusText: 'Đã hủy' };
+  }
+  return { status: 'WAITING_KITCHEN', statusText: 'Chờ bếp' };
+}
 
 export const dashboardService = {
+  /**
+   * Tổng hợp dữ liệu Bảng điều khiển THẬT từ Database qua Backend APIs
+   */
   async getDashboardData(): Promise<DashboardData> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(mockDashboardData);
-      }, 150);
-    });
+    try {
+      const token = authService.getToken();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      };
+
+      const [tablesRes, ordersRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/tables`, { headers }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+        fetch(`${API_BASE_URL}/orders/staff`, { headers }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      ]);
+
+      const rawTables: BackendTable[] = tablesRes?.success && Array.isArray(tablesRes.data) ? tablesRes.data : [];
+      const rawOrders: BackendOrder[] = ordersRes?.success && Array.isArray(ordersRes.data) ? ordersRes.data : [];
+
+      // 1. Map Sơ đồ bàn ăn thực tế
+      const tables: TableItem[] = rawTables.map((t) => {
+        const hasActiveOrder = Boolean(t.don_hang_hien_tai);
+        const { status, statusText } = mapTableStatus(t.trang_thai, hasActiveOrder);
+
+        let capacityText = 'Bàn trống';
+        let detailNote = 'Bàn sạch sẽ';
+        let subAmount: string | undefined = undefined;
+
+        if (status === 'SERVING') {
+          capacityText = t.don_hang_hien_tai ? `${t.don_hang_hien_tai.so_mon} món` : 'Đang phục vụ';
+          detailNote = t.don_hang_hien_tai ? `Đơn #DH${String(t.don_hang_hien_tai.ma_don).padStart(3, '0')}` : 'Có khách';
+          if (t.don_hang_hien_tai?.tong_tien) {
+            subAmount = `Tạm tính: ${new Intl.NumberFormat('vi-VN').format(t.don_hang_hien_tai.tong_tien)} VNĐ`;
+          }
+        } else if (status === 'RESERVED') {
+          capacityText = 'Đã đặt trước';
+          detailNote = 'Khách đặt trước';
+        }
+
+        return {
+          id: String(t.ma_ban),
+          code: t.ten_ban || `Bàn ${String(t.ma_ban).padStart(2, '0')}`,
+          status,
+          statusText,
+          capacityText,
+          detailNote,
+          subAmount,
+          hasAlert: hasActiveOrder && t.don_hang_hien_tai?.trang_thai?.toLowerCase().includes('cho'),
+        };
+      });
+
+      // 2. Tính toán Chỉ số KPI thực tế
+      const validOrders = rawOrders.filter((o) => !o.trang_thai?.toLowerCase().includes('huy'));
+      const totalRevenue = validOrders.reduce((sum, o) => sum + (Number(o.tong_tien) || 0), 0);
+      const totalOrdersCount = validOrders.length;
+      const aov = totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
+
+      const totalTables = tables.length;
+      const activeTables = tables.filter((t) => t.status === 'SERVING').length;
+      const occupancyRate = totalTables > 0 ? Math.round((activeTables / totalTables) * 100) : 0;
+
+      const metrics: MetricCard[] = [
+        {
+          id: 'rev',
+          title: 'Tổng Doanh Thu Trong Ngày',
+          value: `${new Intl.NumberFormat('vi-VN').format(totalRevenue)} VNĐ`,
+          numberValue: new Intl.NumberFormat('vi-VN').format(totalRevenue),
+          unit: 'VNĐ',
+          comparisonText: totalOrdersCount > 0 ? `${totalOrdersCount} đơn hàng ghi nhận` : 'Chưa có phát sinh',
+          isPositive: true,
+          type: 'revenue',
+        },
+        {
+          id: 'orders',
+          title: 'Lượt Phục Vụ & Hóa Đơn',
+          value: `${totalOrdersCount} hóa đơn`,
+          numberValue: String(totalOrdersCount),
+          unit: 'hóa đơn',
+          comparisonText: `${activeTables} bàn đang phục vụ`,
+          isPositive: true,
+          type: 'orders',
+        },
+        {
+          id: 'aov',
+          title: 'Giá Trị Đơn Trung Bình (AOV)',
+          value: `${new Intl.NumberFormat('vi-VN').format(aov)} VNĐ/đơn`,
+          numberValue: new Intl.NumberFormat('vi-VN').format(aov),
+          unit: 'VNĐ/đơn',
+          comparisonText: 'Mức chi tiêu trung bình',
+          isPositive: true,
+          type: 'aov',
+        },
+        {
+          id: 'occupancy',
+          title: 'Bàn Đang Phục Vụ',
+          value: `${activeTables} /${totalTables} bàn`,
+          numberValue: String(activeTables),
+          unit: `/${totalTables} bàn`,
+          comparisonText: `Tỷ lệ lấp đầy: ${occupancyRate}%`,
+          isPositive: true,
+          type: 'occupancy',
+          extraInfo: {
+            totalTables,
+            activeTables,
+            occupancyRate,
+          },
+        },
+      ];
+
+      // 3. Đơn hàng gần đây thực tế
+      const recentOrders: RecentOrder[] = rawOrders.slice(0, 10).map((ord) => {
+        const { status, statusText } = mapOrderStatus(ord.trang_thai);
+        const date = new Date(ord.thoi_gian_tao || Date.now());
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const time = `${hours}:${minutes}`;
+
+        const items = Array.isArray(ord.chitietdonhang) ? ord.chitietdonhang : [];
+        const itemsSummary = items.length > 0
+          ? items.map((i) => `${i.so_luong || 1}x ${i.monan?.ten_mon || `Món #${i.ma_mon}`}`).join(', ')
+          : 'Đơn gọi món tại bàn';
+
+        return {
+          id: String(ord.ma_don),
+          code: `#DH${String(ord.ma_don).padStart(3, '0')}`,
+          tableNumber: String(ord.ma_ban || '01').padStart(2, '0'),
+          tableName: ord.ban?.ten_ban || `Bàn ${ord.ma_ban || ''}`,
+          waiterId: ord.ma_nv ? `NV-${String(ord.ma_nv).padStart(2, '0')}` : 'NV-01',
+          waiterName: ord.nhanvien?.ho_ten || 'Chưa phân công',
+          time,
+          timeAgo: 'Hôm nay',
+          itemsSummary,
+          totalAmount: `${new Intl.NumberFormat('vi-VN').format(ord.tong_tien || 0)} VNĐ`,
+          status,
+          statusText,
+        };
+      });
+
+      // 4. Tổng hợp Top Món Bán Chạy thực tế từ chi tiết đơn hàng
+      const dishSalesMap = new Map<number, { name: string; count: number; totalRev: number; price: number }>();
+      for (const ord of rawOrders) {
+        if (Array.isArray(ord.chitietdonhang)) {
+          for (const ct of ord.chitietdonhang) {
+            if (!ct.ma_mon) continue;
+            const existing = dishSalesMap.get(ct.ma_mon) || {
+              name: ct.monan?.ten_mon || `Món ăn #${ct.ma_mon}`,
+              count: 0,
+              totalRev: 0,
+              price: ct.don_gia || 0,
+            };
+            const qty = ct.so_luong || 1;
+            existing.count += qty;
+            existing.totalRev += qty * (ct.don_gia || 0);
+            dishSalesMap.set(ct.ma_mon, existing);
+          }
+        }
+      }
+
+      const sortedDishes = Array.from(dishSalesMap.values()).sort((a, b) => b.count - a.count);
+      const maxCount = sortedDishes[0]?.count || 1;
+      const topDishes: BestSellingDish[] = sortedDishes.slice(0, 5).map((d, idx) => ({
+        rank: idx + 1,
+        name: d.name,
+        soldCount: d.count,
+        pricePerPortion: `${new Intl.NumberFormat('vi-VN').format(d.price)} VNĐ`,
+        totalRevenue: `${new Intl.NumberFormat('vi-VN').format(d.totalRev)} VNĐ`,
+        percentage: Math.min(100, Math.round((d.count / maxCount) * 100)),
+      }));
+
+      return {
+        metrics,
+        tables,
+        topDishes,
+        recentOrders,
+      };
+    } catch {
+      return {
+        metrics: [],
+        tables: [],
+        topDishes: [],
+        recentOrders: [],
+      };
+    }
   },
 
   async refreshShift(): Promise<DashboardData> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          ...mockDashboardData,
-          metrics: mockDashboardData.metrics.map((m) =>
-            m.id === 'rev'
-              ? {
-                  ...m,
-                  value: '18.960.000 đ',
-                  numberValue: '18.960.000',
-                  unit: 'đ',
-                }
-              : m
-          ),
-        });
-      }, 300);
-    });
+    return this.getDashboardData();
   },
 };

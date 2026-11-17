@@ -104,9 +104,9 @@ function mapBackendToTableItem(item: BackendTable): TableItem {
       };
     } else {
       tableItem.occupiedInfo = {
-        orderCode: `#DH${paddedNum}`,
-        dishCount: 2,
-        duration: '20 phút',
+        orderCode: 'Đang phục vụ',
+        dishCount: 0,
+        duration: 'Vừa vào bàn',
         guestCount: tableItem.seats,
       };
     }

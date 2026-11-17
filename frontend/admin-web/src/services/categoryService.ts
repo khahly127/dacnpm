@@ -33,120 +33,54 @@ const categoryPresetMap: Record<string, { englishName: string; description: stri
   },
 };
 
-// Danh sách danh mục mẫu chuẩn theo thiết kế (đầy đủ 6 danh mục)
-const fallbackCategories: CategoryItem[] = [
-  {
-    id: '1',
-    code: '#DM-01',
-    name: 'Món Khai Vị',
-    englishName: 'Appetizers & Starters',
-    description: 'Kích thích vị giác với pate gan ngỗng béo ngậy, carpaccio thịt bò Wagyu và xà lách hữu cơ sốt nấm Truffle.',
-    dishCount: 8,
-    status: 'VISIBLE',
-    displayOrder: 1,
-  },
-  {
-    id: '2',
-    code: '#DM-02',
-    name: 'Món chính (Bò & Cừu)',
-    englishName: 'Main Courses: Beef & Lamb',
-    description: 'Bò Angus nướng đá nham thạch, sườn cừu Pháp ướp thảo mộc xốt rượu vang đỏ thượng hạng niên vụ 2018.',
-    dishCount: 14,
-    status: 'VISIBLE',
-    displayOrder: 2,
-  },
-  {
-    id: '3',
-    code: '#DM-03',
-    name: 'Mỳ Ý & Risotto',
-    englishName: 'Handcrafted Pasta & Risotto',
-    description: 'Sợi mì tươi thủ công nhào cán trong ngày kết hợp phô mai Grana Padano 24 tháng và nấm Morel quý hiếm.',
-    dishCount: 10,
-    status: 'VISIBLE',
-    displayOrder: 3,
-  },
-  {
-    id: '4',
-    code: '#DM-04',
-    name: 'Tráng Miệng Tinh Tế',
-    englishName: 'Artisan Desserts & Pastry',
-    description: 'Tiramisu nguyên bản vị cà phê espresso Ý nồng nàn, bánh phồng Panna Cotta dâu rừng và sô cô la Valrhona đắng.',
-    dishCount: 6,
-    status: 'VISIBLE',
-    displayOrder: 4,
-  },
-  {
-    id: '5',
-    code: '#DM-05',
-    name: 'Rượu Vang & Đồ Uống',
-    englishName: 'Fine Wine & Beverage Selection',
-    description: 'Bộ sưu tập vang Bordeaux, Chianti Classico bảo quản hầm gỗ sồi kèm cocktail thủ công chế tác bởi Sommelier.',
-    dishCount: 10,
-    status: 'VISIBLE',
-    displayOrder: 5,
-  },
-  {
-    id: '6',
-    code: '#DM-06',
-    name: 'Thực Đơn Mùa Lễ Hội (Ẩn)',
-    englishName: 'Festive Season Special Menu',
-    description: 'Món nướng đặc biệt lễ Noel gồm gà tây nhồi hạt dẻ, bánh khúc cây truyền thống và rượu vang nóng Glühwein quế hồi.',
-    dishCount: 4,
-    status: 'HIDDEN',
-    displayOrder: 6,
-  },
-];
-
 export const categoryService = {
   /**
-   * Lấy danh sách nhóm món/danh mục từ Supabase qua Backend
+   * Lấy danh sách nhóm món/danh mục từ Backend API (cổng 5000)
    */
   async getCategoryList(): Promise<CategoryItem[]> {
-    try {
-      const token = authService.getToken();
-      if (!token) {
-        return fallbackCategories;
-      }
-
-      const response = await fetch(`${API_BASE_URL}/menu/categories`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const resJson = await response.json();
-        if (resJson.success && Array.isArray(resJson.data) && resJson.data.length > 0) {
-          const dbCategories = resJson.data as BackendCategory[];
-
-          return dbCategories.map((item, index) => {
-            const preset = categoryPresetMap[item.ten_nhom] || {
-              englishName: 'Signature Selection',
-              description: 'Các món ăn hảo hạng được chế biến từ nguyên liệu chọn lọc của nhà hàng.',
-            };
-
-            const count = Array.isArray(item.monan) ? item.monan.length : 0;
-            const formattedCode = `#DM-${String(item.ma_nhom || index + 1).padStart(2, '0')}`;
-
-            return {
-              id: String(item.ma_nhom || index + 1),
-              code: formattedCode,
-              name: item.ten_nhom,
-              englishName: preset.englishName,
-              description: preset.description,
-              dishCount: count,
-              status: 'VISIBLE',
-              displayOrder: item.ma_nhom || index + 1,
-            };
-          });
-        }
-      }
-
-      return fallbackCategories;
-    } catch {
-      return fallbackCategories;
+    const token = authService.getToken();
+    if (!token) {
+      throw new Error('Chưa đăng nhập hoặc phiên làm việc hết hạn.');
     }
+
+    const response = await fetch(`${API_BASE_URL}/menu/categories`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Không thể kết nối đến máy chủ Backend (Mã lỗi ${response.status}).`);
+    }
+
+    const resJson = await response.json();
+    if (!resJson.success || !Array.isArray(resJson.data)) {
+      throw new Error(resJson.message || 'Dữ liệu nhóm món ăn không hợp lệ.');
+    }
+
+    const dbCategories = resJson.data as BackendCategory[];
+
+    return dbCategories.map((item, index) => {
+      const preset = categoryPresetMap[item.ten_nhom] || {
+        englishName: 'Signature Selection',
+        description: 'Các món ăn hảo hạng được chế biến từ nguyên liệu chọn lọc của nhà hàng.',
+      };
+
+      const count = Array.isArray(item.monan) ? item.monan.length : 0;
+      const formattedCode = `#DM-${String(item.ma_nhom || index + 1).padStart(2, '0')}`;
+
+      return {
+        id: String(item.ma_nhom || index + 1),
+        code: formattedCode,
+        name: item.ten_nhom,
+        englishName: preset.englishName,
+        description: preset.description,
+        dishCount: count,
+        status: 'VISIBLE',
+        displayOrder: item.ma_nhom || index + 1,
+      };
+    });
   },
 
   /**

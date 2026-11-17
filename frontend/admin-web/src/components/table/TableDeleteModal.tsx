@@ -12,13 +12,19 @@ interface TableDeleteModalProps {
 
 export function TableDeleteModal({ table, onClose, onConfirmDelete }: TableDeleteModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   if (!table) return null;
 
   const handleDelete = async () => {
     setIsDeleting(true);
+    setErrorMessage(null);
     try {
       await onConfirmDelete(table.id);
+      onClose();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Không thể xóa bàn ăn.';
+      setErrorMessage(msg);
     } finally {
       setIsDeleting(false);
     }
@@ -37,6 +43,12 @@ export function TableDeleteModal({ table, onClose, onConfirmDelete }: TableDelet
         <p className="text-xs text-[#8A8175] mt-1.5 leading-relaxed">
           Bạn có chắc chắn muốn xóa <span className="font-bold text-[#2D241E]">{table.name}</span> ({table.area})? Mã QR tương ứng sẽ bị vô hiệu hóa.
         </p>
+
+        {errorMessage && (
+          <div className="mt-3 p-2.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-medium">
+            {errorMessage}
+          </div>
+        )}
 
         <div className="flex items-center gap-2.5 mt-6">
           <button

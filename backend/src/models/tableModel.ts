@@ -48,10 +48,13 @@ export const tableModel = {
         }
     },
     async create(input: { ten_ban: string; trang_thai: string }) {
-        const { data, error } = await supabase.from('ban').insert(input).select().single();
+        const { data: maxRow } = await supabase.from('ban').select('ma_ban').order('ma_ban', { ascending: false }).limit(1).maybeSingle();
+        const nextId = (maxRow?.ma_ban || 0) + 1;
+        const payload = { ...input, ma_ban: nextId };
+        const { data, error } = await supabase.from('ban').insert(payload).select().single();
         if (error) throw new Error(error.message);
         try {
-            await qrModel.saveQRCodeToDB(data.ma_ban, `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://casacozy.vn/b/${data.ma_ban}`);
+            await qrModel.saveQRCodeToDB(payload.ma_ban, `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://casacozy.vn/b/${payload.ma_ban}`);
         } catch {}
         return data;
     },
@@ -59,6 +62,16 @@ export const tableModel = {
         const { data, error } = await supabase.from('ban').update(input).eq('ma_ban', id).select().single();
         if (error) throw new Error(error.message);
         return data;
+    },
+    async hasActiveOrders(tableId: number): Promise<boolean> {
+        const { data, error } = await supabase
+            .from('donhang')
+            .select('ma_don')
+            .eq('ma_ban', tableId)
+            .in('trang_thai', ['Cho tiep nhan', 'Cho xac nhan', 'Dang chuan bi', 'Dang phuc vu'])
+            .limit(1);
+        if (error) return false;
+        return Boolean(data && data.length > 0);
     },
     async delete(id: number) {
         try {

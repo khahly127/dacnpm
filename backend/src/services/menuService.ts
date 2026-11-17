@@ -31,9 +31,23 @@ export const menuService = {
     async listCategories() { return menuModel.listCategories(); },
     async createCategory(body: Record<string, unknown>) { return menuModel.createCategory(getCategoryName(body.ten_nhom)); },
     async updateCategory(id: unknown, body: Record<string, unknown>) { return menuModel.updateCategory(getId(id), getCategoryName(body.ten_nhom)); },
-    async removeCategory(id: unknown) { await menuModel.removeCategory(getId(id)); },
+    async removeCategory(id: unknown) {
+        const categoryId = getId(id);
+        const count = await menuModel.countDishesInCategory(categoryId);
+        if (count > 0) {
+            throw new AppError(`Không thể xóa danh mục đang có ${count} món ăn. Vui lòng chuyển hoặc xóa các món ăn thuộc danh mục này trước!`, 400);
+        }
+        await menuModel.removeCategory(categoryId);
+    },
     async listDishes() { return menuModel.listDishes(); },
     async createDish(body: Record<string, unknown>) { return menuModel.createDish(getDishInput(body)); },
     async updateDish(id: unknown, body: Record<string, unknown>) { return menuModel.updateDish(getId(id), getUpdateDishInput(body)); },
-    async removeDish(id: unknown) { await menuModel.removeDish(getId(id)); },
+    async removeDish(id: unknown) {
+        const dishId = getId(id);
+        const inOrders = await menuModel.isDishInOrders(dishId);
+        if (inOrders) {
+            throw new AppError('Món ăn này đã có trong lịch sử đơn hàng, không thể xóa để bảo toàn dữ liệu. Vui lòng chuyển trạng thái sang "Đã ẩn"!', 400);
+        }
+        await menuModel.removeDish(dishId);
+    },
 };

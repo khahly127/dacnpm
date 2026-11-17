@@ -188,7 +188,7 @@ export function useOrder() {
             ${order.items.map((i) => `
               <div class="row">
                 <span>${i.quantity}x ${i.dishName}</span>
-                <span>${new Intl.NumberFormat('vi-VN').format(i.price * i.quantity)} đ</span>
+                <span>${new Intl.NumberFormat('vi-VN').format(i.price * i.quantity)} VNĐ</span>
               </div>
             `).join('')}
           </div>
