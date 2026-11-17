@@ -1,10 +1,13 @@
 import QRCode from 'qrcode';
 
-export async function generateTableQRCode(maBan: number, baseUrl: string) {
-    try {
-        const targetUrl = `${baseUrl}/menu?table=${maBan}`;
+export function getTableQRCodeTargetUrl(maBan: number) {
+    const paddedTableId = String(maBan).padStart(2, '0');
+    return `https://casacozy.vn/b/${paddedTableId}`;
+}
 
-        return await QRCode.toDataURL(targetUrl, {
+export async function generateTableQRCode(maBan: number) {
+    try {
+        return await QRCode.toDataURL(getTableQRCodeTargetUrl(maBan), {
             errorCorrectionLevel: 'H',
             margin: 2,
             width: 300,

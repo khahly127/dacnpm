@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabaseClient';
 import { qrModel } from './qrModel';
+import { generateTableQRCode } from '../utils/qrGenerator';
 
 export const tableModel = {
     async findById(id: number) {
@@ -50,10 +51,9 @@ export const tableModel = {
     async create(input: { ten_ban: string; trang_thai: string }) {
         const { data, error } = await supabase.from('ban').insert(input).select().single();
         if (error) throw new Error(error.message);
-        try {
-            await qrModel.saveQRCodeToDB(data.ma_ban, `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://casacozy.vn/b/${data.ma_ban}`);
-        } catch {}
-        return data;
+        const qrImage = await generateTableQRCode(data.ma_ban);
+        const qrRecord = await qrModel.saveQRCodeToDB(data.ma_ban, qrImage);
+        return { ...data, maqr: qrRecord };
     },
     async update(id: number, input: Record<string, unknown>) {
         const { data, error } = await supabase.from('ban').update(input).eq('ma_ban', id).select().single();

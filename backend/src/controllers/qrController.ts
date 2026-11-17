@@ -5,8 +5,7 @@ export const qrController = {
     async generateAndSaveQR(req: Request, res: Response, next: NextFunction) {
         try {
             const tableId = Number(req.params.maBan);
-            const baseUrl = `${req.protocol}://${req.get('host')}`;
-            const result = await qrService.generateAndSave(tableId, baseUrl);
+            const result = await qrService.generateAndSave(tableId);
 
             res.status(200).json({
                 success: true,
