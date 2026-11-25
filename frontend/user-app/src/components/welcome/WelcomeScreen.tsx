@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useTableSession } from '@/hooks/useTableSession';
 import { useCallStaff } from '@/hooks/useCallStaff';
 import { BrandHeader } from './BrandHeader';
@@ -9,9 +10,16 @@ import { GuestNameInput } from './GuestNameInput';
 import { ActionButtons } from './ActionButtons';
 import { CallStaffModal } from './CallStaffModal';
 
-export function WelcomeScreen() {
+interface WelcomeScreenProps {
+  onChangeTable?: () => void;
+}
+
+export function WelcomeScreen({ onChangeTable }: WelcomeScreenProps = {}) {
+  const router = useRouter();
   const { tableName, guestName, setGuestName, startOrdering } = useTableSession();
   const { isCallingStaff, callStaffStatus, callStaff, closeFeedbackModal } = useCallStaff();
+
+  const handleChangeTable = onChangeTable || (() => router.push('/?scan=true'));
 
   return (
     <div className="h-screen h-[100dvh] max-h-screen w-full bg-[#EAE3D9] flex justify-center items-stretch overflow-hidden">
@@ -27,7 +35,7 @@ export function WelcomeScreen() {
           {/* Form and Controls */}
           <div className="w-full mt-8 flex flex-col gap-3.5">
             {/* Table Indicator Card */}
-            <TableCard tableName={tableName} />
+            <TableCard tableName={tableName} onChangeTable={handleChangeTable} />
 
             {/* Guest Name Input */}
             <GuestNameInput
