@@ -6,8 +6,9 @@ import { dishDetailService } from '@/services/dishDetailService';
 import { useCart } from '@/hooks/useCart';
 
 export function useDishDetail(dish: Dish | null, onAdded?: () => void) {
-  const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState<number>(1);
+  const { addToCart, getItemQuantity } = useCart();
+  const currentCartQty = dish ? getItemQuantity(dish.id) : 0;
+  const [quantity, setQuantity] = useState<number>(() => (currentCartQty > 0 ? currentCartQty : 1));
   const [kitchenNote, setKitchenNote] = useState<string>('');
 
   // Generate option groups for this dish
@@ -118,10 +119,7 @@ export function useDishDetail(dish: Dish | null, onAdded?: () => void) {
   const handleConfirmAddToCart = () => {
     if (!dish) return;
 
-    // Add to cart with quantity
-    for (let i = 0; i < quantity; i++) {
-      addToCart(dish);
-    }
+    addToCart(dish, selectedOptionsList, kitchenNote, quantity, true);
 
     if (onAdded) onAdded();
   };

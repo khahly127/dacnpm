@@ -9,11 +9,14 @@ import { OrderHeader } from '@/components/order/OrderHeader';
 import { OrderStatCards } from '@/components/order/OrderStatCards';
 import { OrderFilters } from '@/components/order/OrderFilters';
 import { OrderTable } from '@/components/order/OrderTable';
+import { OrderByTableView } from '@/components/order/OrderByTableView';
 import { OrderDetailModal } from '@/components/order/OrderDetailModal';
+import { CancelOrderModal } from '@/components/order/CancelOrderModal';
 import { CreateOrderModal } from '@/components/order/CreateOrderModal';
+import { TablePaymentModal } from '@/components/table/TablePaymentModal';
 import { useOrder } from '@/hooks/useOrder';
 import { authService } from '@/services/authService';
-import { CreateOrderInput } from '@/types/order';
+import { CreateOrderInput, OrderItem } from '@/types/order';
 
 function subscribe(callback: () => void) {
   window.addEventListener('storage', callback);
@@ -54,6 +57,7 @@ export default function OrderPage() {
 
   const {
     orderList,
+    rawOrders,
     stats,
     tabCounts,
     totalItems,
@@ -70,6 +74,7 @@ export default function OrderPage() {
     acceptOrder,
     serveOrder,
     completeOrder,
+    cancelOrder,
     printReceipt,
 
     // Modal Xem chi tiết
@@ -84,11 +89,31 @@ export default function OrderPage() {
     submitCreateOrder,
   } = useOrder();
 
+  const [viewMode, setViewMode] = useState<'ROUNDS' | 'BY_TABLE'>('ROUNDS');
+  const [cancellingOrder, setCancellingOrder] = useState<OrderItem | null>(null);
+  const [paymentTable, setPaymentTable] = useState<{ id: number | string; name?: string } | null>(null);
+
+  const handleOpenTablePayment = (tableId: number | string, tableName?: string) => {
+    setPaymentTable({ id: tableId, name: tableName });
+  };
+
+  const handleCloseTablePayment = () => {
+    setPaymentTable(null);
+  };
+
+  const handlePaymentSuccess = () => {
+    refreshOrders();
+    setToastMessage({
+      type: 'success',
+      text: 'Thanh toán thành công! Bàn đã được chuyển về Bàn trống.',
+    });
+  };
+
   const handleAcceptOrder = async (id: string) => {
     await acceptOrder(id);
     setToastMessage({
       type: 'success',
-      text: 'Đã tiếp nhận đơn hàng, bếp bắt đầu chế biến!',
+      text: 'Đã xác nhận đơn hàng, bếp bắt đầu chế biến!',
     });
   };
 
@@ -105,6 +130,14 @@ export default function OrderPage() {
     setToastMessage({
       type: 'success',
       text: 'Đã hoàn tất đơn hàng thành công!',
+    });
+  };
+
+  const handleConfirmCancel = async (id: string, reason: string) => {
+    await cancelOrder(id);
+    setToastMessage({
+      type: 'success',
+      text: `Đã hủy đơn hàng thành công! (${reason})`,
     });
   };
 
@@ -164,33 +197,48 @@ export default function OrderPage() {
           {/* 4 Thẻ chỉ số đơn hàng */}
           <OrderStatCards stats={stats} />
 
-          {/* Thanh Tabs & Ô tìm kiếm */}
+          {/* Thanh Tabs, Ô tìm kiếm & Chuyển đổi chế độ xem */}
           <OrderFilters
             filters={filters}
             tabCounts={tabCounts}
             onFilterChange={setFilters}
             onRefresh={refreshOrders}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
           />
 
-          {/* Bảng danh sách đơn hàng */}
-          {loading ? (
-            <div className="bg-white rounded-2xl border border-[#EAE3D6] p-12 text-center text-sm font-semibold text-[#8E2813]">
-              Đang tải danh sách đơn hàng từ hệ thống...
-            </div>
-          ) : (
-            <OrderTable
-              orders={orderList}
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={totalItems}
-              pageSize={10}
-              onPageChange={setCurrentPage}
-              onAcceptOrder={handleAcceptOrder}
-              onServeOrder={handleServeOrder}
+          {viewMode === 'BY_TABLE' ? (
+            <OrderByTableView
+              orders={rawOrders}
+              onPayTable={handleOpenTablePayment}
               onCompleteOrder={handleCompleteOrder}
-              onPrintReceipt={printReceipt}
               onViewOrder={openViewModal}
             />
+          ) : (
+            <>
+              {/* Bảng danh sách đơn hàng */}
+              {loading ? (
+                <div className="bg-white rounded-2xl border border-[#EAE3D6] p-12 text-center text-sm font-semibold text-[#8E2813]">
+                  Đang tải danh sách đơn hàng từ hệ thống...
+                </div>
+              ) : (
+                <OrderTable
+                  orders={orderList}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  pageSize={10}
+                  onPageChange={setCurrentPage}
+                  onAcceptOrder={handleAcceptOrder}
+                  onServeOrder={handleServeOrder}
+                  onCompleteOrder={handleCompleteOrder}
+                  onPayTable={handleOpenTablePayment}
+                  onCancelOrder={setCancellingOrder}
+                  onPrintReceipt={printReceipt}
+                  onViewOrder={openViewModal}
+                />
+              )}
+            </>
           )}
         </main>
       </div>
@@ -208,6 +256,23 @@ export default function OrderPage() {
         isOpen={isCreateOpen}
         onClose={closeCreateModal}
         onSubmit={handleCreateSubmit}
+      />
+
+      {/* Modal 3: Thanh toán Bàn tổng hợp */}
+      <TablePaymentModal
+        isOpen={Boolean(paymentTable)}
+        tableId={paymentTable?.id || null}
+        tableName={paymentTable?.name}
+        onClose={handleCloseTablePayment}
+        onSuccess={handlePaymentSuccess}
+      />
+
+      {/* Modal 4: Hủy / Từ chối đơn hàng */}
+      <CancelOrderModal
+        isOpen={Boolean(cancellingOrder)}
+        order={cancellingOrder}
+        onClose={() => setCancellingOrder(null)}
+        onConfirm={handleConfirmCancel}
       />
     </div>
   );

@@ -15,14 +15,14 @@ function DishDetailThumbnail({ src, alt }: { src?: string | null; alt: string })
 
   if (!isValid || hasError) {
     return (
-      <div className="w-12 h-12 rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] shrink-0 flex items-center justify-center">
-        <Utensils className="w-5 h-5 text-[#A89E92] opacity-50" />
+      <div className="w-14 h-14 rounded-xl bg-[#FAF7F2] border border-[#EAE3D6] shrink-0 flex items-center justify-center">
+        <Utensils className="w-6 h-6 text-[#A89E92] opacity-50" />
       </div>
     );
   }
 
   return (
-    <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#FAF7F2] border border-[#EAE3D6] shrink-0 relative">
+    <div className="w-14 h-14 rounded-xl overflow-hidden bg-[#FAF7F2] border border-[#EAE3D6] shrink-0 relative shadow-2xs">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src!}
@@ -115,14 +115,9 @@ export function DishDetailModal({
       ),
     },
     {
-      field: 'Hình ảnh minh họa',
+      field: 'Hình ảnh',
       value: dish.image ? (
-        <div className="flex items-center gap-3">
-          <DishDetailThumbnail src={dish.image} alt={dish.name} />
-          <span className="text-[11px] text-[#8A8175] truncate max-w-[200px]">
-            {dish.image}
-          </span>
-        </div>
+        <DishDetailThumbnail src={dish.image} alt={dish.name} />
       ) : (
         <span className="text-xs text-[#8A8175] italic">Chưa có ảnh tải lên</span>
       ),

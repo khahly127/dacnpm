@@ -34,4 +34,9 @@ export const tableService = {
         }
         return tableModel.delete(tableId);
     },
+    async checkout(idValue: unknown, body: Record<string, unknown>) {
+        const tableId = getTableId(idValue);
+        const paymentMethod = typeof body?.paymentMethod === 'string' ? body.paymentMethod : 'TIEN_MAT';
+        return tableModel.checkout(tableId, paymentMethod);
+    },
 };

@@ -22,7 +22,7 @@ export function OrderDetailModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
       <div
-        className="bg-white rounded-2xl border border-[#EAE3D6] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]"
+        className="bg-white rounded-2xl border border-[#EAE3D6] shadow-2xl w-full max-w-xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Modal */}
@@ -36,11 +36,6 @@ export function OrderDetailModal({
                 <h2 className="text-base font-bold text-[#26201E]">
                   Chi Tiết Đơn Hàng {order.code}
                 </h2>
-                {order.isVip && (
-                  <span className="px-1.5 py-0.2 rounded-md bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] text-[9px] font-black uppercase">
-                    VIP
-                  </span>
-                )}
               </div>
               <p className="text-xs text-[#8A8175]">
                 {order.tableName} • Giờ tạo: {order.time} ({order.relativeTime})
@@ -94,9 +89,9 @@ export function OrderDetailModal({
                 <thead>
                   <tr className="bg-[#FAF7F2] border-b border-[#EAE3D6] text-[11px] font-bold text-[#8A8175]">
                     <th className="py-2.5 px-3">TÊN MÓN</th>
-                    <th className="py-2.5 px-2 text-center w-16">SL</th>
-                    <th className="py-2.5 px-3 text-right w-24">ĐƠN GIÁ</th>
-                    <th className="py-2.5 px-3 text-right w-28">THÀNH TIỀN</th>
+                    <th className="py-2.5 px-2 text-center w-14 whitespace-nowrap">SL</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">ĐƠN GIÁ</th>
+                    <th className="py-2.5 px-3 text-right whitespace-nowrap">THÀNH TIỀN</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#F5EFE6]">
@@ -108,13 +103,13 @@ export function OrderDetailModal({
                           <div className="text-[10px] text-[#8A8175] italic">{item.note}</div>
                         )}
                       </td>
-                      <td className="py-2.5 px-2 text-center font-bold text-[#8E2813]">
+                      <td className="py-2.5 px-2 text-center font-bold text-[#8E2813] whitespace-nowrap">
                         {item.quantity}
                       </td>
-                      <td className="py-2.5 px-3 text-right text-[#524B46]">
+                      <td className="py-2.5 px-3 text-right text-[#524B46] whitespace-nowrap font-medium">
                         {new Intl.NumberFormat('vi-VN').format(item.price)} VNĐ
                       </td>
-                      <td className="py-2.5 px-3 text-right font-bold text-[#26201E]">
+                      <td className="py-2.5 px-3 text-right font-bold text-[#26201E] whitespace-nowrap">
                         {new Intl.NumberFormat('vi-VN').format(item.price * item.quantity)} VNĐ
                       </td>
                     </tr>

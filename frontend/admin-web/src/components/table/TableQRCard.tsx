@@ -120,16 +120,13 @@ export function TableQRCard({
       }`}
     >
       <div>
-        {/* Header: Table Name + Area + Toggle Switch & Dots */}
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-1.5">
-              {table.isVip && <Star className="w-3.5 h-3.5 text-[#D97706] fill-current" />}
-              <h3 className="text-xs font-bold text-[#2D241E]">
-                {table.name} • {table.seats} Ghế
-              </h3>
-            </div>
-            <p className="text-[11px] text-[#8A8175] mt-0.5">{table.area}</p>
+        {/* Header: Table Name + Toggle Switch & Dots */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            {table.isVip && <Star className="w-3.5 h-3.5 text-[#D97706] fill-current" />}
+            <h3 className="text-xs font-bold text-[#2D241E]">
+              {table.name}
+            </h3>
           </div>
 
           <div className="flex items-center gap-2">
@@ -190,9 +187,6 @@ export function TableQRCard({
 
           <span className="text-xs font-bold text-[#2D241E] mt-2 tracking-tight">
             {table.qrUrl}
-          </span>
-          <span className="text-[10px] text-[#8A8175] mt-0.5">
-            Quét để gọi món tại bàn
           </span>
         </div>
       </div>

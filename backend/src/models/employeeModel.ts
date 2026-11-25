@@ -10,6 +10,12 @@ export const employeeModel = {
         return data;
     },
 
+    async findById(id: number) {
+        const { data, error } = await supabase.from('nhanvien').select('*').eq('ma_nv', id).maybeSingle();
+        if (error) throw new Error(error.message);
+        return data;
+    },
+
     async list() {
         const { data, error } = await supabase.from('nhanvien').select(publicFields).order('ma_nv');
         if (error) throw new Error(error.message);

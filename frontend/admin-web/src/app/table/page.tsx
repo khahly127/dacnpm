@@ -16,6 +16,7 @@ import { TableQRModal } from '@/components/table/TableQRModal';
 import { TableFormModal } from '@/components/table/TableFormModal';
 import { TableDeleteModal } from '@/components/table/TableDeleteModal';
 import { TablePrintAllModal } from '@/components/table/TablePrintAllModal';
+import { TablePaymentModal } from '@/components/table/TablePaymentModal';
 import { Pagination } from '@/components/common/Pagination';
 import { useTable } from '@/hooks/useTable';
 import { authService } from '@/services/authService';
@@ -95,7 +96,10 @@ export default function TablePage() {
     handlePrintSingle,
     handleDownloadAllZip,
     handlePrintAllPdf,
+    refreshTables,
   } = useTable();
+
+  const [paymentModalTable, setPaymentModalTable] = useState<TableItem | null>(null);
 
   const onOpenEdit = (table: TableItem) => {
     setEditModalTable(table);
@@ -231,6 +235,7 @@ export default function TablePage() {
                 onViewQr={(table) => setQrModalTable(table)}
                 onEdit={onOpenEdit}
                 onDelete={onOpenDelete}
+                onPay={(table) => setPaymentModalTable(table)}
               />
             ) : (
               <TableTableView
@@ -238,6 +243,7 @@ export default function TablePage() {
                 onViewQr={(table) => setQrModalTable(table)}
                 onEdit={onOpenEdit}
                 onDelete={onOpenDelete}
+                onPay={(table) => setPaymentModalTable(table)}
               />
             )
           ) : (
@@ -310,6 +316,22 @@ export default function TablePage() {
         isOpen={isPrintAllOpen}
         tables={allTables}
         onClose={() => setIsPrintAllOpen(false)}
+      />
+
+      {/* Modal 6: Thanh toán Bàn trực tiếp */}
+      <TablePaymentModal
+        isOpen={Boolean(paymentModalTable)}
+        tableId={paymentModalTable?.id || null}
+        tableName={paymentModalTable?.name}
+        onClose={() => setPaymentModalTable(null)}
+        onSuccess={() => {
+          setPaymentModalTable(null);
+          refreshTables();
+          setToastMessage({
+            type: 'success',
+            text: 'Thanh toán thành công! Bàn đã được chuyển về Bàn trống.',
+          });
+        }}
       />
     </div>
   );

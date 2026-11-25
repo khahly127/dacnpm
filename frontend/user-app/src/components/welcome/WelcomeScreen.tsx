@@ -14,9 +14,9 @@ export function WelcomeScreen() {
   const { isCallingStaff, callStaffStatus, callStaff, closeFeedbackModal } = useCallStaff();
 
   return (
-    <div className="min-h-screen w-full bg-[#EAE3D9] flex justify-center items-stretch">
-      {/* Mobile Column - kéo sát từ mép trên cùng xuống mép dưới cùng màn hình */}
-      <main className="w-full max-w-[420px] min-h-screen bg-[#FAF7F2] border-x border-[#E2D9CC] shadow-sm flex flex-col justify-center px-6 py-8 sm:py-12 relative">
+    <div className="h-screen h-[100dvh] max-h-screen w-full bg-[#EAE3D9] flex justify-center items-stretch overflow-hidden">
+      {/* Mobile Column - kéo sát từ mép trên cùng xuống mép dưới cùng màn hình, cố định chiều dài */}
+      <main className="w-full max-w-[420px] h-full max-h-full bg-[#FAF7F2] border-x border-[#E2D9CC] shadow-sm flex flex-col justify-center px-6 py-8 sm:py-12 relative overflow-y-auto no-scrollbar">
         <div className="w-full flex flex-col items-center">
           {/* Brand & Slogan */}
           <BrandHeader

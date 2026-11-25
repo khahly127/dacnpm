@@ -53,6 +53,7 @@ export interface RecentOrder {
   waiterId: string;      // 'NV-01'
   waiterName: string;    // 'Tuấn Anh'
   time: string;          // '19:42'
+  date?: string;         // '19/11/2026'
   timeAgo: string;       // '10p trước'
   itemsSummary: string;  // '1x Bò Wagyu, 1x Mỳ Ý Trúc Đen, 2x Vang Đỏ & Trà'
   note?: string;         // 'Ghi chú: Steak Medium'
@@ -66,4 +67,8 @@ export interface DashboardData {
   tables: TableItem[];
   topDishes: BestSellingDish[];
   recentOrders: RecentOrder[];
+  totalOrdersCount?: number;
+  timeRange?: DashboardTimeRange;
 }
+
+export type DashboardTimeRange = 'TODAY' | '7_DAYS' | 'THIS_MONTH' | 'THIS_YEAR' | 'ALL';

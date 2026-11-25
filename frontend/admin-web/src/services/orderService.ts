@@ -29,13 +29,13 @@ interface BackendOrder {
 }
 
 const mapBackendStatus = (statusRaw?: string): { status: OrderStatus; statusText: string } => {
-  if (!statusRaw) return { status: 'PENDING', statusText: 'Chờ tiếp nhận' };
+  if (!statusRaw) return { status: 'PENDING', statusText: 'Chờ xác nhận' };
   const s = statusRaw.toLowerCase();
-  if (s.includes('cho') || s.includes('xac nhan') || s.includes('pending')) {
-    return { status: 'PENDING', statusText: 'Chờ tiếp nhận' };
+  if (s.includes('cho') || s.includes('xac nhan') || s.includes('tiep nhan') || s.includes('pending')) {
+    return { status: 'PENDING', statusText: 'Chờ xác nhận' };
   }
   if (s.includes('chuan bi') || s.includes('cooking') || s.includes('dang nau') || s.includes('nau') || s.includes('che bien')) {
-    return { status: 'COOKING', statusText: 'Đang chế biến' };
+    return { status: 'COOKING', statusText: 'Đang chuẩn bị' };
   }
   if (s.includes('len mon') || s.includes('served') || s.includes('dang phuc vu')) {
     return { status: 'SERVED', statusText: 'Đang phục vụ' };
@@ -46,7 +46,7 @@ const mapBackendStatus = (statusRaw?: string): { status: OrderStatus; statusText
   if (s.includes('huy') || s.includes('cancel')) {
     return { status: 'CANCELLED', statusText: 'Đã hủy' };
   }
-  return { status: 'PENDING', statusText: 'Chờ tiếp nhận' };
+  return { status: 'PENDING', statusText: 'Chờ xác nhận' };
 };
 
 const mapStatusToBackend = (status: OrderStatus): string => {
@@ -108,7 +108,13 @@ export const orderService = {
               ? items.map((i) => `${i.quantity}x ${i.dishName}`).join(', ')
               : 'Đơn gọi món tại bàn';
 
-            const date = new Date(item.thoi_gian_tao || Date.now());
+            const rawDate = item.thoi_gian_tao;
+            const normalizedDateStr = rawDate
+              ? rawDate.includes('Z') || rawDate.includes('+')
+                ? rawDate
+                : `${rawDate}Z`
+              : null;
+            const date = new Date(normalizedDateStr || Date.now());
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             const time = `${hours}:${minutes}`;
@@ -116,7 +122,7 @@ export const orderService = {
             return {
               id: String(item.ma_don),
               code,
-              isVip: item.ma_ban % 5 === 0,
+              isVip: false,
               tableId: item.ma_ban,
               tableName,
               employeeId: `NV-${String(item.ma_nv || 1).padStart(2, '0')}`,
@@ -128,7 +134,7 @@ export const orderService = {
               formattedTotal,
               time,
               relativeTime: 'Vừa cập nhật',
-              createdAt: item.thoi_gian_tao || new Date().toISOString(),
+              createdAt: normalizedDateStr || new Date().toISOString(),
               status,
               statusText,
             };
@@ -146,7 +152,7 @@ export const orderService = {
   },
 
   /**
-   * Cập nhật trạng thái đơn hàng (Ví dụ: Chờ tiếp nhận -> Đang chế biến -> Đang phục vụ -> Hoàn tất)
+   * Cập nhật trạng thái đơn hàng (Ví dụ: Chờ xác nhận -> Đang chế biến -> Đang phục vụ -> Hoàn tất)
    */
   async updateOrderStatus(id: string, status: OrderStatus): Promise<{ success: boolean; message?: string }> {
     try {

@@ -8,9 +8,10 @@ import { useCart } from '@/hooks/useCart';
 interface DishCardProps {
   dish: Dish;
   onOpenDetail?: (dish: Dish) => void;
+  onAddedToCart?: () => void;
 }
 
-export function DishCard({ dish, onOpenDetail }: DishCardProps) {
+export function DishCard({ dish, onOpenDetail, onAddedToCart }: DishCardProps) {
   const { getItemQuantity, addToCart, removeFromCart } = useCart();
   const quantity = getItemQuantity(dish.id);
   const [imageError, setImageError] = useState(false);
@@ -112,17 +113,20 @@ export function DishCard({ dish, onOpenDetail }: DishCardProps) {
               </button>
             </div>
           ) : (
-            /* Add Button: + Thêm */
+            /* Add Button: Nút tròn dấu + */
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 addToCart(dish);
+                if (onAddedToCart) {
+                  onAddedToCart();
+                }
               }}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#8B2323] hover:bg-[#781E1E] active:scale-95 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#8B2323] hover:bg-[#781E1E] active:scale-90 text-white flex items-center justify-center shadow-xs transition-all cursor-pointer"
+              aria-label={`Thêm ${dish.name}`}
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Thêm</span>
+              <Plus className="w-4 h-4 stroke-[2.5]" />
             </button>
           )}
         </div>

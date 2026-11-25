@@ -5,7 +5,7 @@ function formatPrice(amount: number): string {
   return `${amount.toLocaleString('vi-VN')} VNĐ`;
 }
 
-function resolveImage(rawImage?: string | null, _name?: string): string | null {
+function resolveImage(rawImage?: string | null): string | null {
   if (!rawImage) return null;
   const trimmed = rawImage.trim();
   if (!trimmed) return null;
@@ -94,7 +94,7 @@ export const menuService = {
         description: getDishDescription(item.ten_mon, categoryName),
         price,
         formattedPrice: formatPrice(price),
-        image: resolveImage(item.hinh_anh, item.ten_mon),
+        image: resolveImage(item.hinh_anh),
         categoryId: item.ma_nhom || 1,
         categoryName,
         isAvailable,

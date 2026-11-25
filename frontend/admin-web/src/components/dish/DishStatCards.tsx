@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { UtensilsCrossed, CheckCircle2, MinusCircle, EyeOff } from 'lucide-react';
+import { UtensilsCrossed, CheckCircle2, MinusCircle, BadgeDollarSign } from 'lucide-react';
 import { DishStats } from '@/types/dish';
 
 interface DishStatCardsProps {
@@ -53,20 +53,20 @@ export function DishStatCards({ stats }: DishStatCardsProps) {
         </div>
       </div>
 
-      {/* Thẻ 3: Tạm hết món */}
+      {/* Thẻ 3 (Đã gộp): Tạm dừng / Hết */}
       <div className="bg-white rounded-2xl border border-[#EAE3D6] p-4 flex items-center justify-between shadow-2xs">
         <div>
           <span className="text-[11px] font-semibold text-[#8A8175] uppercase tracking-wider block">
-            Tạm hết món
+            Tạm dừng / Hết
           </span>
           <div className="mt-1 flex items-baseline gap-1.5">
             <span className="text-xl font-black text-[#C23924]">
-              {String(stats.outOfStock).padStart(2, '0')}
+              {String(stats.pausedOrOutOfStock ?? 0).padStart(2, '0')}
             </span>
             <span className="text-xs font-bold text-[#8A8175]">Món</span>
           </div>
           <span className="text-[11px] text-[#C23924] font-medium mt-0.5 block">
-            Hết nguyên liệu trong ca
+            Nguyên liệu hoặc tạm dừng
           </span>
         </div>
         <div className="w-10 h-10 rounded-xl bg-[#FEF2F2] text-[#C23924] flex items-center justify-center shrink-0 border border-[#FECACA]">
@@ -74,24 +74,23 @@ export function DishStatCards({ stats }: DishStatCardsProps) {
         </div>
       </div>
 
-      {/* Thẻ 4: Đã ẩn / Thời vụ */}
+      {/* Thẻ 4 (Thay mới): Giá trung bình */}
       <div className="bg-white rounded-2xl border border-[#EAE3D6] p-4 flex items-center justify-between shadow-2xs">
         <div>
           <span className="text-[11px] font-semibold text-[#8A8175] uppercase tracking-wider block">
-            Đã ẩn / Thời vụ
+            Giá trung bình
           </span>
           <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-xl font-black text-[#6B7280]">
-              {String(stats.hidden).padStart(2, '0')}
+            <span className="text-lg sm:text-xl font-black text-[#92400E] whitespace-nowrap">
+              {stats.formattedAveragePrice || '~185.000 VNĐ'}
             </span>
-            <span className="text-xs font-bold text-[#8A8175]">Món</span>
           </div>
-          <span className="text-[11px] text-[#8A8175] mt-0.5 block">
-            Tạm dừng hoặc món mùa lễ
+          <span className="text-[11px] text-[#8A8175] mt-0.5 block font-medium">
+            {stats.priceRangeText || 'Dao động 45k – 550k'}
           </span>
         </div>
-        <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] text-[#6B7280] flex items-center justify-center shrink-0 border border-[#E5E7EB]">
-          <EyeOff className="w-5 h-5" />
+        <div className="w-10 h-10 rounded-xl bg-[#FEF3C7] text-[#D97706] flex items-center justify-center shrink-0 border border-[#FDE68A]">
+          <BadgeDollarSign className="w-5 h-5" />
         </div>
       </div>
     </div>

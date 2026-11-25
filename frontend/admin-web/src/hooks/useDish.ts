@@ -88,15 +88,46 @@ export function useDish() {
     const available = dishList.filter((d) => d.status === 'AVAILABLE').length;
     const outOfStock = dishList.filter((d) => d.status === 'OUT_OF_STOCK').length;
     const hidden = dishList.filter((d) => d.status === 'HIDDEN').length;
+    const pausedOrOutOfStock = outOfStock + hidden;
     const availableRate = total > 0 ? `${((available / total) * 100).toFixed(1)}%` : '0%';
+
+    // Tính toán giá trung bình và khoảng giá
+    const prices = dishList
+      .map((d) => d.price)
+      .filter((p) => typeof p === 'number' && !isNaN(p) && p > 0);
+    const totalPrice = prices.reduce((sum, p) => sum + p, 0);
+    const averagePrice = prices.length > 0 ? Math.round(totalPrice / prices.length) : 0;
+    const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+    const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
+
+    const formatShortPrice = (val: number) => {
+      if (val >= 1000000) {
+        return `${(val / 1000000).toFixed(1).replace('.0', '')}tr`;
+      }
+      if (val >= 1000) {
+        return `${Math.round(val / 1000)}k`;
+      }
+      return `${val}đ`;
+    };
+
+    const formattedAveragePrice = `~${new Intl.NumberFormat('vi-VN').format(averagePrice)} VNĐ`;
+    const priceRangeText = prices.length > 0
+      ? `Dao động ${formatShortPrice(minPrice)} – ${formatShortPrice(maxPrice)}`
+      : 'Chưa có thông tin giá';
 
     return {
       total,
       totalCategories: categories.length || 6,
       available,
       availableRate,
+      pausedOrOutOfStock,
       outOfStock,
       hidden,
+      averagePrice,
+      formattedAveragePrice,
+      minPrice,
+      maxPrice,
+      priceRangeText,
     };
   }, [dishList, categories]);
 

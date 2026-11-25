@@ -46,12 +46,12 @@ export function TableQRTableView({
         <table className="w-full text-left border-collapse table-fixed min-w-[960px]">
           <thead>
             <tr className="border-b border-[#F0EAE1] text-[11px] font-black text-[#8A8175] uppercase tracking-wider bg-[#FAF7F2]">
-              <th className="w-[10%] py-3.5 px-4 whitespace-nowrap">MÃ BÀN</th>
-              <th className="w-[20%] py-3.5 px-4 whitespace-nowrap">TÊN BÀN &amp; KHU VỰC</th>
+              <th className="w-[12%] py-3.5 px-4 whitespace-nowrap">MÃ BÀN</th>
+              <th className="w-[18%] py-3.5 px-4 whitespace-nowrap">TÊN BÀN</th>
               <th className="w-[12%] py-3.5 px-4 whitespace-nowrap">MÃ QR</th>
               <th className="w-[22%] py-3.5 px-4 whitespace-nowrap">LIÊN KẾT GỌI MÓN</th>
-              <th className="w-[14%] py-3.5 px-4 whitespace-nowrap">TRẠNG THÁI QR</th>
-              <th className="w-[22%] py-3.5 px-4 text-right whitespace-nowrap">THAO TÁC</th>
+              <th className="w-[16%] py-3.5 px-4 whitespace-nowrap">TRẠNG THÁI QR</th>
+              <th className="w-[20%] py-3.5 px-4 text-right whitespace-nowrap">THAO TÁC</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#F5EFE6] text-xs">
@@ -65,11 +65,11 @@ export function TableQRTableView({
                   #{table.code}
                 </td>
 
-                {/* Tên bàn & Khu vực */}
+                {/* Tên bàn */}
                 <td className="py-3.5 px-4">
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-[#2D241E]">
-                      {table.name} • {table.seats} Ghế
+                      {table.name}
                     </span>
                     {table.isVip && (
                       <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-[#FEF3E7] text-[#D97706] text-[10px] font-black">
@@ -78,9 +78,6 @@ export function TableQRTableView({
                       </span>
                     )}
                   </div>
-                  <span className="text-[11px] text-[#8A8175] block mt-0.5">
-                    {table.area}
-                  </span>
                 </td>
 
                 {/* Thumbnail QR */}
@@ -123,9 +120,6 @@ export function TableQRTableView({
                       )}
                     </button>
                   </div>
-                  <span className="text-[10px] text-[#8A8175] block mt-0.5">
-                    Quét để gọi món tại bàn
-                  </span>
                 </td>
 
                 {/* Trạng thái QR: Toggle switch */}

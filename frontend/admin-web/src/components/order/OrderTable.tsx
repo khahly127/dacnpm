@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Eye, Printer, Check, CheckCheck, Clock } from 'lucide-react';
+import { Eye, Ban, Check, CheckCheck, Clock, CreditCard } from 'lucide-react';
 import { OrderItem } from '@/types/order';
 import { Pagination } from '@/components/common/Pagination';
 
@@ -15,6 +15,8 @@ interface OrderTableProps {
   onAcceptOrder?: (id: string) => void;
   onServeOrder?: (id: string) => void;
   onCompleteOrder?: (id: string) => void;
+  onPayTable?: (tableId: number, tableName?: string) => void;
+  onCancelOrder?: (order: OrderItem) => void;
   onPrintReceipt?: (order: OrderItem) => void;
   onViewOrder?: (order: OrderItem) => void;
 }
@@ -31,7 +33,10 @@ function formatOrderDateTime(createdAt?: string, fallbackTime?: string) {
     };
   }
 
-  const d = new Date(createdAt);
+  const normalized = createdAt.includes('Z') || createdAt.includes('+')
+    ? createdAt
+    : `${createdAt}Z`;
+  const d = new Date(normalized);
   if (isNaN(d.getTime())) {
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
@@ -65,6 +70,8 @@ export function OrderTable({
   onAcceptOrder,
   onServeOrder,
   onCompleteOrder,
+  onPayTable,
+  onCancelOrder,
   onPrintReceipt,
   onViewOrder,
 }: OrderTableProps) {
@@ -99,18 +106,11 @@ export function OrderTable({
 
                 return (
                   <tr key={order.id} className="hover:bg-[#FCFAF7] transition-colors">
-                    {/* Cột 1: Mã Đơn + Huy hiệu VIP */}
+                    {/* Cột 1: Mã Đơn */}
                     <td className="py-4 px-4 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-black text-[#8E2813] text-xs tracking-tight">
-                          {order.code}
-                        </span>
-                        {order.isVip && (
-                          <span className="px-1.5 py-0.2 rounded-md bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] text-[9px] font-black uppercase">
-                            VIP
-                          </span>
-                        )}
-                      </div>
+                      <span className="font-black text-[#8E2813] text-xs tracking-tight">
+                        {order.code}
+                      </span>
                     </td>
 
                     {/* Cột 2: Bàn */}
@@ -196,7 +196,7 @@ export function OrderTable({
                             onClick={() => onAcceptOrder(order.id)}
                             className="px-2.5 py-1 bg-[#8E2813] hover:bg-[#73200F] text-white rounded-lg text-xs font-bold shadow-xs transition-colors cursor-pointer"
                           >
-                            Tiếp nhận
+                            Xác nhận
                           </button>
                         )}
 
@@ -211,26 +211,39 @@ export function OrderTable({
                           </button>
                         )}
 
-                        {(isServed || isCompleted) && onCompleteOrder && (
+                        {isServed && onCompleteOrder && (
                           <button
                             type="button"
                             onClick={() => onCompleteOrder(order.id)}
-                            className="px-2 py-1 border border-[#EAE3D6] bg-[#ECFDF5]/50 text-[#059669] hover:bg-[#ECFDF5] rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                            className="px-2.5 py-1 bg-[#059669] hover:bg-[#047857] text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
+                            title="Xác nhận món ăn đã được bưng lên bàn cho thực khách"
                           >
-                            <CheckCheck className="w-3 h-3" />
-                            <span>Hoàn tất</span>
+                            <CheckCheck className="w-3.5 h-3.5" />
+                            <span>Hoàn tất món</span>
                           </button>
                         )}
 
-                        {/* In hóa đơn */}
-                        {onPrintReceipt && (
+                        {isCompleted && onPayTable && (
                           <button
                             type="button"
-                            title="In hóa đơn"
-                            onClick={() => onPrintReceipt(order)}
-                            className="p-1.5 text-[#8A8175] hover:text-[#26201E] hover:bg-[#FAF7F2] rounded-lg transition-colors cursor-pointer"
+                            onClick={() => onPayTable(order.tableId, order.tableName)}
+                            className="px-2.5 py-1 bg-[#8E2813] hover:bg-[#73200F] text-white rounded-lg text-xs font-bold shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
+                            title={`Mở thanh toán cho ${order.tableName}`}
                           >
-                            <Printer className="w-3.5 h-3.5" />
+                            <CreditCard className="w-3.5 h-3.5" />
+                            <span>Thanh toán bàn</span>
+                          </button>
+                        )}
+
+                        {/* Hủy / Từ chối đơn hàng (khi đơn chưa hoàn tất hoặc chưa hủy) */}
+                        {onCancelOrder && !isCompleted && order.status !== 'CANCELLED' && (
+                          <button
+                            type="button"
+                            title="Hủy / Từ chối đợt gọi này (Bếp hết món, khách đổi ý...)"
+                            onClick={() => onCancelOrder(order)}
+                            className="p-1.5 text-[#8A8175] hover:text-[#DC2626] hover:bg-[#FEF2F2] rounded-lg transition-colors cursor-pointer"
+                          >
+                            <Ban className="w-3.5 h-3.5" />
                           </button>
                         )}
 

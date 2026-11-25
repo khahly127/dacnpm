@@ -19,12 +19,14 @@ interface DishDetailModalProps {
   dish: Dish | null;
   isOpen: boolean;
   onClose: () => void;
+  onOpenCart?: () => void;
 }
 
 export function DishDetailModal({
   dish,
   isOpen,
   onClose,
+  onOpenCart,
 }: DishDetailModalProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -43,7 +45,11 @@ export function DishDetailModal({
     toggleQuickTag,
     handleConfirmAddToCart,
   } = useDishDetail(dish, () => {
-    onClose();
+    if (onOpenCart) {
+      onOpenCart();
+    } else {
+      onClose();
+    }
   });
 
   if (!isOpen || !dish) return null;
@@ -71,7 +77,7 @@ export function DishDetailModal({
         </div>
 
         {/* Scrollable Content Body */}
-        <div className="flex-1 overflow-y-auto px-4 pb-6 no-scrollbar">
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 no-scrollbar">
           {/* Large Hero Image */}
           <div className="relative w-full h-48 sm:h-52 rounded-2xl overflow-hidden bg-[#FAF7F2] border border-[#EFE9DF] shrink-0 mb-4 shadow-2xs">
             {dish.image && !imageError ? (

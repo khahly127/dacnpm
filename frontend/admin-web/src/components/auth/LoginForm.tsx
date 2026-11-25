@@ -145,10 +145,10 @@ export function LoginForm() {
 
         {/* Form nhập liệu */}
         <form onSubmit={handleSubmit} className="space-y-2.5">
-          {/* Trường 1: Mã nhân viên / Email */}
+          {/* Trường 1: Email */}
           <div>
             <label className="block text-[11px] font-bold text-[#26201E] mb-1">
-              Mã nhân viên / Email
+              Email
             </label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#A89E92]" />

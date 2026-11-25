@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Search, ChevronDown, RotateCw, ArrowUpDown } from 'lucide-react';
-import { CategoryFiltersState, CategoryStatus } from '@/types/category';
+import { CategoryFiltersState } from '@/types/category';
 
 interface CategoryFiltersProps {
   filters: CategoryFiltersState;
@@ -29,27 +29,9 @@ export function CategoryFilters({
         />
       </div>
 
-      {/* Bộ lọc dropdown & nút làm mới */}
+      {/* Bộ lọc sắp xếp & nút làm mới */}
       <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
-        {/* Dropdown 1: Trạng thái QR */}
-        <div className="relative">
-          <select
-            value={filters.statusFilter}
-            onChange={(e) =>
-              onFilterChange({
-                statusFilter: e.target.value as 'ALL' | CategoryStatus,
-              })
-            }
-            className="appearance-none pl-3.5 pr-8 py-2 bg-white border border-[#EAE3D6] rounded-xl text-xs font-semibold text-[#3C342F] focus:outline-none focus:border-[#8E2813] transition-colors shadow-2xs cursor-pointer"
-          >
-            <option value="ALL">Tất cả trạng thái</option>
-            <option value="VISIBLE">Đang hiển thị</option>
-            <option value="HIDDEN">Đang ẩn</option>
-          </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8A8175] pointer-events-none" />
-        </div>
-
-        {/* Dropdown 2: Sắp xếp */}
+        {/* Dropdown: Sắp xếp */}
         <div className="relative">
           <select
             value={filters.sortBy}

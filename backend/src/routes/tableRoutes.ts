@@ -8,4 +8,5 @@ router.get('/', tableController.list);
 router.post('/', verifyToken, checkRole('QuanLy', 'QuanTriVien', 'ADMIN'), tableController.create);
 router.patch('/:id', verifyToken, checkRole('QuanLy', 'QuanTriVien', 'ADMIN'), tableController.update);
 router.delete('/:id', verifyToken, checkRole('QuanLy', 'QuanTriVien', 'ADMIN'), tableController.delete);
+router.post('/:id/checkout', verifyToken, checkRole('QuanLy', 'QuanTriVien', 'ADMIN'), tableController.checkout);
 export default router;

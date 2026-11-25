@@ -30,8 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-[#EAE3D9] text-[#231F20] flex flex-col font-sans">
+    <html lang="vi" className={`${inter.variable} h-full antialiased overflow-hidden`}>
+      <body className="h-full h-[100dvh] max-h-screen bg-[#EAE3D9] text-[#231F20] flex flex-col font-sans overflow-hidden select-none">
         <TableSessionProvider initialTable="05">
           <CartProvider>
             {children}

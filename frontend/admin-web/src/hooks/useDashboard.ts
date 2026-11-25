@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { DashboardData, TableItem, RecentOrder } from '@/types/dashboard';
-import { dashboardService } from '@/services/dashboardService';
+import { DashboardData, TableItem, RecentOrder, DashboardTimeRange } from '@/types/dashboard';
+import { dashboardService, BackendTable, BackendOrder } from '@/services/dashboardService';
 
 export type TableFilterType = 'all' | 'occupied' | 'available' | 'reserved';
 
 export function useDashboard() {
-  const [data, setData] = useState<DashboardData | null>(null);
+  const [rawData, setRawData] = useState<{ rawTables: BackendTable[]; rawOrders: BackendOrder[] } | null>(null);
+  const [timeRange, setTimeRange] = useState<DashboardTimeRange>('TODAY');
   const [loading, setLoading] = useState<boolean>(true);
   const [tableFilter, setTableFilter] = useState<TableFilterType>('all');
   const [orderSearchQuery, setOrderSearchQuery] = useState<string>('');
@@ -15,8 +16,8 @@ export function useDashboard() {
     async function loadData() {
       try {
         setLoading(true);
-        const res = await dashboardService.getDashboardData();
-        setData(res);
+        const res = await dashboardService.getDashboardRawData();
+        setRawData(res);
       } finally {
         setLoading(false);
       }
@@ -27,12 +28,18 @@ export function useDashboard() {
   const handleRefreshShift = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const refreshed = await dashboardService.refreshShift();
-      setData(refreshed);
+      const refreshed = await dashboardService.getDashboardRawData();
+      setRawData(refreshed);
     } finally {
       setIsRefreshing(false);
     }
   }, []);
+
+  // Tính toán dữ liệu Dashboard tức thì (0ms latency) khi chuyển đổi nút bộ lọc thời gian
+  const data = useMemo<DashboardData | null>(() => {
+    if (!rawData) return null;
+    return dashboardService.computeDashboard(rawData.rawTables, rawData.rawOrders, timeRange);
+  }, [rawData, timeRange]);
 
   // Lọc bàn theo tab (Tất cả, Có khách, Bàn trống, Đặt trước)
   const filteredTables = useMemo<TableItem[]>(() => {
@@ -77,6 +84,8 @@ export function useDashboard() {
     data,
     loading,
     isRefreshing,
+    timeRange,
+    setTimeRange,
     tableFilter,
     setTableFilter,
     tableCounts,

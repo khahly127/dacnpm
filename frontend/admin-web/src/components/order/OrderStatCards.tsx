@@ -31,11 +31,11 @@ export function OrderStatCards({ stats }: OrderStatCardsProps) {
         </div>
       </div>
 
-      {/* Thẻ 2: Chờ tiếp nhận (Cần xử lý ngay) */}
+      {/* Thẻ 2: Chờ xác nhận (Cần xử lý ngay) */}
       <div className="bg-white rounded-2xl border border-[#EAE3D6] p-5 shadow-2xs flex items-center justify-between">
         <div>
           <span className="text-xs font-semibold text-[#8A8175]">
-            Chờ tiếp nhận
+            Chờ xác nhận
           </span>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-2xl font-black text-[#DC2626]">
@@ -53,11 +53,11 @@ export function OrderStatCards({ stats }: OrderStatCardsProps) {
         </div>
       </div>
 
-      {/* Thẻ 3: Đang chế biến */}
+      {/* Thẻ 3: Đang chuẩn bị */}
       <div className="bg-white rounded-2xl border border-[#EAE3D6] p-5 shadow-2xs flex items-center justify-between">
         <div>
           <span className="text-xs font-semibold text-[#8A8175]">
-            Đang chế biến
+            Đang chuẩn bị
           </span>
           <div className="text-2xl font-black text-[#26201E] mt-1">
             {String(stats.cooking).padStart(2, '0')}{' '}

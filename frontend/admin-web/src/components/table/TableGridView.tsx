@@ -10,9 +10,10 @@ interface TableGridViewProps {
   onViewQr: (table: TableItem) => void;
   onEdit: (table: TableItem) => void;
   onDelete: (table: TableItem) => void;
+  onPay?: (table: TableItem) => void;
 }
 
-export function TableGridView({ tables, onViewQr, onEdit, onDelete }: TableGridViewProps) {
+export function TableGridView({ tables, onViewQr, onEdit, onDelete, onPay }: TableGridViewProps) {
   if (tables.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-[#EAE3D6] p-12 text-center shadow-2xs">
@@ -36,6 +37,7 @@ export function TableGridView({ tables, onViewQr, onEdit, onDelete }: TableGridV
           onViewQr={onViewQr}
           onEdit={onEdit}
           onDelete={onDelete}
+          onPay={onPay}
         />
       ))}
     </div>

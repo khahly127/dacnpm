@@ -46,14 +46,6 @@ export function UserDetailModal({
       field: 'Tài khoản đăng nhập',
       value: <span className="font-semibold text-[#26201E]">{user.email || user.username}</span>,
     },
-    ...(user.phone
-      ? [
-          {
-            field: 'Số điện thoại',
-            value: <span className="text-[#3C342F]">{user.phone}</span>,
-          },
-        ]
-      : []),
     {
       field: 'Vai trò & Phân quyền',
       value: isAdmin ? (

@@ -28,6 +28,18 @@ export function useTable() {
   const [isPrintAllOpen, setIsPrintAllOpen] = useState<boolean>(false);
 
   // Load initial tables from Database
+  const refreshTables = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await tableService.getTables();
+      setTables(data);
+    } catch {
+      // ignore
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
     tableService.getTables().then((data) => {
@@ -230,5 +242,6 @@ export function useTable() {
     handlePrintSingle,
     handleDownloadAllZip,
     handlePrintAllPdf,
+    refreshTables,
   };
 }

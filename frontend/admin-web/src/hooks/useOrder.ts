@@ -147,7 +147,7 @@ export function useOrder() {
   }, []);
 
   const acceptOrder = useCallback(
-    (id: string) => handleUpdateStatus(id, 'COOKING', 'Đang nấu'),
+    (id: string) => handleUpdateStatus(id, 'COOKING', 'Đang chuẩn bị'),
     [handleUpdateStatus]
   );
 
@@ -159,6 +159,14 @@ export function useOrder() {
   const completeOrder = useCallback(
     (id: string) => handleUpdateStatus(id, 'COMPLETED', 'Đã phục vụ'),
     [handleUpdateStatus]
+  );
+
+  const cancelOrder = useCallback(
+    async (id: string) => {
+      await handleUpdateStatus(id, 'CANCELLED', 'Đã hủy');
+      loadData();
+    },
+    [handleUpdateStatus, loadData]
   );
 
   // In hóa đơn
@@ -254,6 +262,7 @@ export function useOrder() {
     acceptOrder,
     serveOrder,
     completeOrder,
+    cancelOrder,
     printReceipt,
 
     // Modal Xem chi tiết

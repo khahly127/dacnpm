@@ -1,13 +1,13 @@
 # API Backend
 
-Base URL khi chay local: `http://localhost:3000`
+Base URL khi chay local: `http://localhost:5000`
 
 ## Cau hinh va xac thuc
 
 Backend can cac bien trong `backend/.env`:
 
 ```env
-PORT=3000
+PORT=5000
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-key
 JWT_SECRET=mot-chuoi-bi-mat-dai-va-ngau-nhien
