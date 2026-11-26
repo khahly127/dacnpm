@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { OrderItem, OrderStatus, OrderStats, OrderFiltersState, CreateOrderInput } from '@/types/order';
 import { orderService } from '@/services/orderService';
+import { authService } from '@/services/authService';
+import { subscribeToNewOrders } from '@/lib/realtime';
 
 export function useOrder() {
   const [orderList, setOrderList] = useState<OrderItem[]>([]);
@@ -54,6 +56,19 @@ export function useOrder() {
     return () => {
       ignore = true;
     };
+  }, []);
+
+  useEffect(() => {
+    const token = authService.getToken();
+    if (!token) return;
+
+    return subscribeToNewOrders(token, () => {
+      orderService.getOrderList()
+        .then(setOrderList)
+        .catch((error: unknown) => {
+          console.error('Không thể cập nhật danh sách khi có đơn mới:', error);
+        });
+    });
   }, []);
 
   // Tính toán 4 thẻ thống kê ở đầu màn hình
@@ -147,7 +162,7 @@ export function useOrder() {
   }, []);
 
   const acceptOrder = useCallback(
-    (id: string) => handleUpdateStatus(id, 'COOKING', 'Đang nấu'),
+    (id: string) => handleUpdateStatus(id, 'COOKING', 'Đang chuẩn bị'),
     [handleUpdateStatus]
   );
 
@@ -159,6 +174,14 @@ export function useOrder() {
   const completeOrder = useCallback(
     (id: string) => handleUpdateStatus(id, 'COMPLETED', 'Đã phục vụ'),
     [handleUpdateStatus]
+  );
+
+  const cancelOrder = useCallback(
+    async (id: string) => {
+      await handleUpdateStatus(id, 'CANCELLED', 'Đã hủy');
+      loadData();
+    },
+    [handleUpdateStatus, loadData]
   );
 
   // In hóa đơn
@@ -254,6 +277,7 @@ export function useOrder() {
     acceptOrder,
     serveOrder,
     completeOrder,
+    cancelOrder,
     printReceipt,
 
     // Modal Xem chi tiết

@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect, useSyncExternalStore } from "react"
 import { useRouter } from "next/navigation";
 import { Search, Bell, User, LogOut, ChevronDown } from "lucide-react";
 import { authService } from "@/services/authService";
+import { ProfileModal } from "./ProfileModal";
 
 function subscribe(callback: () => void) {
   window.addEventListener("storage", callback);
@@ -17,6 +18,7 @@ function subscribe(callback: () => void) {
 export function Header() {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -142,7 +144,10 @@ export function Header() {
               {/* Dòng 1: Thông tin tài khoản */}
               <button
                 type="button"
-                onClick={() => setIsDropdownOpen(false)}
+                onClick={() => {
+                  setIsDropdownOpen(false);
+                  setIsProfileOpen(true);
+                }}
                 className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium text-[#3C342F] hover:bg-[#FAF7F2] hover:text-[#8E2813] transition-colors cursor-pointer text-left"
               >
                 <User className="w-4 h-4 text-[#7C7267]" />
@@ -163,6 +168,12 @@ export function Header() {
           )}
         </div>
       </div>
+
+      {/* Modal Thông Tin Tài Khoản & Đổi Mật Khẩu */}
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+      />
     </header>
   );
 }

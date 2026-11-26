@@ -19,8 +19,14 @@ export interface DishStats {
   totalCategories: number;
   available: number;
   availableRate: string;
-  outOfStock: number;
-  hidden: number;
+  pausedOrOutOfStock: number;   // Số món tạm dừng hoặc hết món
+  averagePrice: number;         // Giá trung bình (số nguyên)
+  formattedAveragePrice: string;// Ví dụ: '~185.000 VNĐ'
+  minPrice: number;             // Giá thấp nhất
+  maxPrice: number;             // Giá cao nhất
+  priceRangeText: string;       // Ví dụ: 'Dao động 45k – 550k'
+  outOfStock?: number;
+  hidden?: number;
 }
 
 export interface DishFiltersState {

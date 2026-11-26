@@ -51,6 +51,18 @@ export interface TableStats {
   areaCount: number;
 }
 
+export interface PaymentQrData {
+  tableId: number;
+  tableName: string;
+  totalAmount: number;
+  orderIds: number[];
+  bankBin: string;
+  accountNumber: string;
+  accountName: string;
+  transferContent: string;
+  qrImage: string;
+}
+
 export interface CreateTableInput {
   name: string;
   area: TableArea;

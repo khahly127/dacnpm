@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, ShieldCheck, Briefcase, Lock, User, Mail, Phone, Hash, AlertCircle } from 'lucide-react';
+import { X, ShieldCheck, Briefcase, Lock, User, Mail, Hash, AlertCircle } from 'lucide-react';
 import { UserItem, UserRole, CreateUserInput, UpdateUserInput } from '@/types/user';
 
 interface UserFormModalProps {
@@ -22,7 +22,6 @@ function UserFormContent({
   const [email, setEmail] = useState(mode === 'edit' && initialData ? initialData.email : '');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>(mode === 'edit' && initialData ? initialData.role : 'MANAGER');
-  const [phone, setPhone] = useState(mode === 'edit' && initialData ? initialData.phone || '' : '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -57,7 +56,6 @@ function UserFormContent({
         name: name.trim(),
         email: email.trim(),
         role,
-        phone: phone.trim() || undefined,
         ...(password.trim() ? { password: password.trim() } : {}),
       };
 
@@ -259,22 +257,6 @@ function UserFormContent({
           </div>
         </div>
 
-        {/* Số điện thoại */}
-        <div>
-          <label className="block text-xs font-bold text-[#3C342F] mb-1.5">
-            Số điện thoại liên hệ (Tùy chọn)
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A89E92]" />
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Ví dụ: 0988 ••• 391"
-              className="w-full pl-9 pr-3.5 py-2 bg-[#FAF7F2] border border-[#EAE3D6] rounded-xl text-xs text-[#26201E] placeholder-[#A89E92] focus:outline-none focus:border-[#8E2813] focus:bg-white transition-colors"
-            />
-          </div>
-        </div>
 
         {/* Footer nút hành động */}
         <div className="pt-3 border-t border-[#F0EAE1] flex items-center justify-end gap-2.5">

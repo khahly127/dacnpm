@@ -1,13 +1,13 @@
 # API Backend
 
-Base URL khi chay local: `http://localhost:3000`
+Base URL khi chay local: `http://localhost:5000`
 
 ## Cau hinh va xac thuc
 
 Backend can cac bien trong `backend/.env`:
 
 ```env
-PORT=3000
+PORT=5000
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-key
 JWT_SECRET=mot-chuoi-bi-mat-dai-va-ngau-nhien
@@ -53,6 +53,43 @@ Tra ve JWT va thong tin tai khoan neu dang nhap thanh cong.
 | Method | Endpoint | Mo ta |
 | --- | --- | --- |
 | GET | `/api/tables/:id` | Xem, dong thoi xac thuc, ban sau khi quet QR |
+| GET | `/api/qr/payment/:maBan` | Tao VietQR dong cho tong cac don chua huy cua ban |
+
+`GET /api/qr/payment/:maBan` doc tong tien va ma don tu Supabase; client khong duoc truyen so tien. QR napas247 chua BIN, tai khoan nhan, so tien VND va noi dung `B<maBan> DH<maDonMoiNhat>`. Endpoint dung chung cho khach quet QR va nhan vien in tam tinh. Cau hinh `VIETQR_BANK_BIN`, `VIETQR_ACCOUNT_NUMBER` va `VIETQR_ACCOUNT_NAME` trong `backend/.env` theo tai khoan cua nha hang (khong dung thong tin mau).
+
+## Realtime Socket.IO
+
+Socket.IO su dung cung host/port voi backend. Client admin/manager ket noi voi JWT qua handshake auth:
+
+```js
+io(SOCKET_URL, { auth: { token } });
+```
+
+Server chi cho phep tai khoan `QuanLy`, `QuanTriVien`, `ADMIN` vao room staff va phat su kien `order:created` sau khi don va chi tiet don da duoc luu thanh cong:
+
+```json
+{
+  "ma_don": 123,
+  "ma_ban": 5,
+  "ten_ban": "Ban 05",
+  "tong_tien": 62500,
+  "thoi_gian_tao": "2026-11-26T12:00:00.000Z",
+  "trang_thai": "Cho xac nhan",
+  "items": [
+    { "ten_mon": "Mon an", "so_luong": 1, "don_gia": 57870, "ghi_chu": null }
+  ]
+}
+```
+
+Dashboard nhan su kien nay de hien thong bao va tai lai thong tin don/ban moi nhat. Khi nhan vien cap nhat trang thai don, room staff nhan `order:status-updated`.
+
+Ung dung khach ket noi khong can JWT, nhung phai gui `tableId` trong handshake de chi vao room cua ban do:
+
+```js
+io(SOCKET_URL, { auth: { tableId: 5 } });
+```
+
+Khi co don moi hoac cap nhat trang thai don, server gui `table:orders-changed` toi room ban. Client tu tai lai `GET /api/orders/table/:tableId` de cap nhat tien do, khong can tai lai trang. Su kien room chi chua ma ban, khong gui chi tiet don.
 
 ### Don hang
 
@@ -84,6 +121,9 @@ Gia mon va tong tien duoc lay tu database khi tao don, khong lay tu client.
 | PATCH | `/api/orders/:id/status` | Cap nhat trang thai don |
 | GET | `/api/tables` | Xem danh sach ban |
 | PATCH | `/api/tables/:id` | Cap nhat ten hoac trang thai ban |
+| POST | `/api/tables/:id/checkout` | Xac nhan thanh toan va tra ban |
+
+`POST /api/tables/:id/checkout` chi danh cho nhan vien/quan ly da dang nhap. Sau khi kiem tra thanh toan, frontend goi endpoint nay; backend danh dau cac don chua thanh toan cua ban la `Da thanh toan` va chuyen ban ve `Trong`. Trang thai phuc vu cua don van duoc giu rieng.
 
 Body cap nhat trang thai don:
 

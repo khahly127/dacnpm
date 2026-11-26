@@ -19,4 +19,13 @@ export const qrController = {
             next(error);
         }
     },
+    async generatePaymentQr(req: Request, res: Response, next: NextFunction) {
+        try {
+            const tableId = Number(req.params.maBan);
+            const data = await qrService.generatePaymentQr(tableId);
+            res.status(200).json({ success: true, data });
+        } catch (error) {
+            next(error);
+        }
+    },
 };

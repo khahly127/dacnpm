@@ -7,6 +7,7 @@ export interface AuthenticatedRequest extends Request {
 export interface OrderItemInput {
     ma_mon: number;
     so_luong: number;
+    don_gia?: number;
     ghi_chu?: string;
 }
 

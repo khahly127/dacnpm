@@ -190,7 +190,6 @@ export default function CategoryPage() {
               totalPages={totalPages}
               totalItems={totalItems}
               onPageChange={setCurrentPage}
-              onToggleStatus={toggleStatus}
               onViewCategory={openViewModal}
               onEditCategory={openEditModal}
               onDeleteCategory={openDeleteModal}

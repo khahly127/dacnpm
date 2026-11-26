@@ -47,6 +47,12 @@ export const userService = {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          authService.logout();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+        }
         return [];
       }
 
@@ -89,6 +95,10 @@ export const userService = {
 
       const resJson = await response.json();
       if (!response.ok || !resJson.success) {
+        if (response.status === 401) {
+          authService.logout();
+          if (typeof window !== 'undefined') window.location.href = '/login';
+        }
         return { success: false, message: resJson.message || 'Thêm nhân viên thất bại.' };
       }
 
@@ -135,6 +145,10 @@ export const userService = {
 
       const resJson = await response.json();
       if (!response.ok || !resJson.success) {
+        if (response.status === 401) {
+          authService.logout();
+          if (typeof window !== 'undefined') window.location.href = '/login';
+        }
         return { success: false, message: resJson.message || 'Cập nhật nhân viên thất bại.' };
       }
 
@@ -176,6 +190,10 @@ export const userService = {
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          authService.logout();
+          if (typeof window !== 'undefined') window.location.href = '/login';
+        }
         let msg = 'Không thể xóa nhân viên.';
         try {
           const resJson = await response.json();

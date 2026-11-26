@@ -70,6 +70,7 @@ backend/
 ### 🛒 Quản lý Đặt món & Đơn hàng (Orders)
 * Đặt món theo bàn: Tự động kiểm tra món ăn có tồn tại và còn món hay không, tự động tính tổng tiền từ giá niêm yết trong cơ sở dữ liệu.
 * Khi đặt món thành công: Tự động cập nhật trạng thái bàn sang `Dang phuc vu`.
+* Phát sự kiện Socket.IO `order:created` sau khi lưu đơn thành công; Dashboard admin/manager nhận thông báo bàn và danh sách món, đồng thời tự cập nhật dữ liệu.
 * Khi đơn hàng chuyển sang `Hoan tat` hoặc `Da huy`: Tự động kiểm tra và hoàn trả trạng thái bàn về `Trong` nếu bàn không còn đơn nào khác đang phục vụ.
 * Có cơ chế fallback `employeeId = 1` an toàn khi cập nhật trạng thái đơn hàng trong môi trường thử nghiệm.
 
@@ -106,6 +107,9 @@ PORT=5000
 JWT_SECRET=casacozy_secret_key_2025
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-key
+VIETQR_BANK_BIN=your_6_digit_bank_bin
+VIETQR_ACCOUNT_NUMBER=your_bank_account_number
+VIETQR_ACCOUNT_NAME=YOUR_ACCOUNT_HOLDER_NAME
 ```
 
 ### Bước 4: Khởi chạy môi trường phát triển (Development)
@@ -118,6 +122,8 @@ Khi khởi động thành công, terminal sẽ thông báo:
 Server dang chay tai http://localhost:5000
 ```
 
+Admin/manager đăng nhập bằng JWT để kết nối Socket.IO tại cùng host/port với backend. Frontend tự suy ra địa chỉ Socket.IO từ `NEXT_PUBLIC_API_URL`; có thể đặt `NEXT_PUBLIC_SOCKET_URL` nếu cần chỉ định riêng địa chỉ kết nối.
+
 ---
 
 ## 📡 5. Tóm tắt các Endpoints chính
@@ -128,17 +134,21 @@ Server dang chay tai http://localhost:5000
 | **GET** | `/api/menu` | Public | Lấy toàn bộ thực đơn theo nhóm |
 | **POST** | `/api/orders` | Public | Đặt món tại bàn |
 | **GET** | `/api/orders/table/:tableId` | Public | Lấy đơn hàng theo mã bàn |
+| **GET** | `/api/qr/payment/:maBan` | Public | Sinh VietQR động theo tổng đơn hiện tại của bàn |
 | **GET** | `/api/tables` | Public | Xem danh sách bàn và đơn hiện tại |
 | **POST** | `/api/tables` | Bearer Token (`QuanLy`, `QuanTriVien`, `ADMIN`) | Thêm bàn mới (tự sinh QR) |
 | **PATCH** | `/api/tables/:id` | Bearer Token (`QuanLy`, `QuanTriVien`, `ADMIN`) | Cập nhật thông tin bàn |
 | **DELETE** | `/api/tables/:id` | Bearer Token (`QuanLy`, `QuanTriVien`, `ADMIN`) | Xóa bàn ăn |
 | **GET** | `/api/orders` | Bearer Token (`QuanLy`, `QuanTriVien`, `ADMIN`) | Danh sách tất cả đơn hàng |
 | **PATCH** | `/api/orders/:id/status`| Bearer Token (`QuanLy`, `QuanTriVien`, `ADMIN`) | Cập nhật trạng thái đơn |
+| **POST** | `/api/tables/:id/checkout` | Bearer Token (`QuanLy`, `QuanTriVien`, `ADMIN`) | Xác nhận đã thanh toán, cập nhật trạng thái đơn và trả bàn |
 | **GET/POST/PATCH/DELETE** | `/api/menu/categories` | Bearer Token (`QuanTriVien`, `ADMIN`) | Quản lý nhóm món |
 | **GET/POST/PATCH/DELETE** | `/api/menu/dishes` | Bearer Token (`QuanTriVien`, `ADMIN`) | Quản lý món ăn |
 | **GET/POST/PATCH/DELETE** | `/api/employees` | Bearer Token (`QuanTriVien`, `ADMIN`) | Quản lý nhân viên |
 
 > 📖 **Xem tài liệu chi tiết:** Để xem đầy đủ định dạng body JSON và mẫu response từng API, hãy xem file [docs/API.md](../docs/API.md).
+
+> **Cơ sở dữ liệu:** Trước khi dùng chức năng xác nhận thanh toán, hãy thêm cột `trang_thai_thanh_toan` theo migration ở [docs/database.md](../docs/database.md). Trạng thái này tách biệt với trạng thái phục vụ.
 
 ---
 

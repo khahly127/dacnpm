@@ -28,4 +28,10 @@ export const tableController = {
             res.json({ success: true, message: 'Xoa ban thanh cong.' });
         } catch (error) { next(error); }
     },
+    async checkout(req: Request, res: Response, next: NextFunction) {
+        try {
+            const result = await tableService.checkout(req.params.id, req.body);
+            res.json({ success: true, message: 'Thanh toán bàn thành công!', data: result });
+        } catch (error) { next(error); }
+    },
 };

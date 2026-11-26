@@ -87,6 +87,7 @@ Lưu trữ thông tin các phiếu gọi món của khách tại bàn.
 | `thoi_gian_tao` | `TIMESTAMP` | `DEFAULT CURRENT_TIMESTAMP` | Thời điểm tạo đơn hàng |
 | `tong_tien` | `NUMERIC(12,2)` | `DEFAULT 0` | Tổng giá trị đơn hàng |
 | `trang_thai` | `VARCHAR(50)` | `NOT NULL` | Trạng thái đơn (VD: Chờ xác nhận, Đang phục vụ, Đã hoàn tất) |
+| `trang_thai_thanh_toan` | `VARCHAR(30)` | `NOT NULL`, mặc định `Chua thanh toan` | Trạng thái thanh toán độc lập với trạng thái phục vụ |
 
 ---
 
@@ -157,6 +158,7 @@ CREATE TABLE IF NOT EXISTS donhang (
     thoi_gian_tao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     tong_tien NUMERIC(12, 2) DEFAULT 0,
     trang_thai VARCHAR(50) NOT NULL,
+    trang_thai_thanh_toan VARCHAR(30) NOT NULL DEFAULT 'Chua thanh toan',
     CONSTRAINT fk_don_ban FOREIGN KEY (ma_ban) REFERENCES ban(ma_ban),
     CONSTRAINT fk_don_nv FOREIGN KEY (ma_nv) REFERENCES nhanvien(ma_nv)
 );
@@ -172,3 +174,12 @@ CREATE TABLE IF NOT EXISTS chitietdonhang (
     CONSTRAINT fk_ct_don FOREIGN KEY (ma_don) REFERENCES donhang(ma_don) ON DELETE CASCADE,
     CONSTRAINT fk_ct_mon FOREIGN KEY (ma_mon) REFERENCES monan(ma_mon)
 );
+```
+
+### Cập nhật cơ sở dữ liệu hiện có
+
+Chạy lệnh sau trong Supabase SQL Editor trước khi cập nhật/chạy backend. Các đơn cũ sẽ mặc định là chưa thanh toán; nếu đã có đơn thanh toán trước đây, cần đối soát và cập nhật trạng thái thủ công.
+
+```sql
+ALTER TABLE donhang
+ADD COLUMN IF NOT EXISTS trang_thai_thanh_toan VARCHAR(30) NOT NULL DEFAULT 'Chua thanh toan';

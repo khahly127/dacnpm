@@ -52,7 +52,12 @@ export function TopDishes({ dishes }: TopDishesProps) {
 
       {/* Danh sách 5 món: Món số 1 bắt đầu ngang hàng với Hàng 1 của Sơ đồ bàn ăn */}
       <div className="flex-1 flex flex-col justify-between pt-4 pb-1">
-        {dishes.map((dish) => (
+        {dishes.length === 0 ? (
+          <div className="flex-1 flex items-center justify-center text-xs text-[#8A8175] py-10 text-center">
+            Chưa có món ăn nào phát sinh trong khoảng thời gian này.
+          </div>
+        ) : (
+          dishes.map((dish) => (
           <div key={dish.rank} className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -87,7 +92,8 @@ export function TopDishes({ dishes }: TopDishesProps) {
               />
             </div>
           </div>
-        ))}
+        ))
+      )}
       </div>
     </div>
   );

@@ -2,12 +2,14 @@ interface TableCardProps {
   tableName: string;
   subtitle?: string;
   statusText?: string;
+  onChangeTable?: () => void;
 }
 
 export function TableCard({
   tableName,
   subtitle = 'Sẵn sàng phục vụ',
   statusText = 'Đã kết nối',
+  onChangeTable,
 }: TableCardProps) {
   return (
     <div className="w-full bg-white rounded-2xl p-3.5 sm:p-4 shadow-[0_2px_12px_rgba(0,0,0,0.03)] border border-[#EFE9DF] flex items-center justify-between gap-3 transition-all">
@@ -38,13 +40,27 @@ export function TableCard({
         </div>
       </div>
 
-      {/* Huy hiệu trạng thái kết nối bên phải gọn gàng, tinh tế */}
-      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-semibold select-none flex-shrink-0 shadow-xs">
-        <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-        </span>
-        <span>{statusText}</span>
+      {/* Cụm trạng thái kết nối & Nút đổi bàn / quét lại */}
+      <div className="flex flex-col items-end gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-semibold select-none shadow-xs">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <span>{statusText}</span>
+        </div>
+
+        {onChangeTable && (
+          <button
+            type="button"
+            onClick={onChangeTable}
+            title="Đổi số bàn hoặc quét lại mã QR"
+            className="text-[11px] text-[#8E2813] hover:text-[#73200F] font-semibold hover:underline transition-colors flex items-center gap-1 cursor-pointer select-none"
+          >
+            <span>Đổi bàn</span>
+            <span className="text-[12px]">⇄</span>
+          </button>
+        )}
       </div>
     </div>
   );

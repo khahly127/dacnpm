@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { CreditCard } from 'lucide-react';
 import { TableItem } from '@/types/dashboard';
 import { TableFilterType } from '@/hooks/useDashboard';
 
@@ -9,9 +10,10 @@ interface TableMapProps {
   filter: TableFilterType;
   onFilterChange: (filter: TableFilterType) => void;
   counts: { all: number; occupied: number; available: number; reserved: number };
+  onPayTable?: (tableId: number | string, tableName?: string) => void;
 }
 
-export function TableMap({ tables, filter, onFilterChange, counts }: TableMapProps) {
+export function TableMap({ tables, filter, onFilterChange, counts, onPayTable }: TableMapProps) {
   const getBadgeStyle = (status: TableItem['status']) => {
     switch (status) {
       case 'AVAILABLE':
@@ -141,14 +143,33 @@ export function TableMap({ tables, filter, onFilterChange, counts }: TableMapPro
                 <div className="text-xs font-bold text-[#26201E]">
                   {table.capacityText}
                 </div>
-                <div className="text-[11px] text-[#8A8175] font-normal">
+                <div className="text-[11px] text-[#8A8175] font-normal truncate" title={table.detailNote}>
                   {table.detailNote}
                 </div>
               </div>
 
-              {/* Tạm tính */}
-              <div className="text-right text-xs font-bold text-[#26201E]">
-                {table.subAmount ? table.subAmount : <span className="opacity-0">-</span>}
+              {/* Tạm tính & Nút Thanh toán */}
+              <div className="flex items-center justify-between text-xs font-bold text-[#26201E] pt-1">
+                <div>
+                  {isOccupied && onPayTable && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const numId = Number(String(table.id).replace(/\D/g, '')) || table.id;
+                        onPayTable(numId, table.code);
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#8E2813] hover:bg-[#73200F] text-white text-[10px] font-bold shadow-2xs transition-colors cursor-pointer"
+                      title="Mở thanh toán tổng hợp cho bàn này"
+                    >
+                      <CreditCard className="w-3 h-3" />
+                      <span>Thanh toán</span>
+                    </button>
+                  )}
+                </div>
+                <div>
+                  {table.subAmount ? table.subAmount : <span className="opacity-0">-</span>}
+                </div>
               </div>
             </div>
           );

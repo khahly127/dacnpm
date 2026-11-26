@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useSyncExternalStore } from 'react';
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Header } from '@/components/layout/Header';
@@ -8,6 +8,8 @@ import { StatCards } from '@/components/dashboard/StatCards';
 import { TableMap } from '@/components/dashboard/TableMap';
 import { TopDishes } from '@/components/dashboard/TopDishes';
 import { RecentOrdersTable } from '@/components/dashboard/RecentOrdersTable';
+import { DashboardTimeFilter } from '@/components/dashboard/DashboardTimeFilter';
+import { TablePaymentModal } from '@/components/table/TablePaymentModal';
 import { RefreshIcon } from '@/components/common/Icons';
 import { useDashboard } from '@/hooks/useDashboard';
 import { authService } from '@/services/authService';
@@ -43,6 +45,8 @@ export default function DashboardPage() {
     data,
     loading,
     isRefreshing,
+    timeRange,
+    setTimeRange,
     tableFilter,
     setTableFilter,
     tableCounts,
@@ -51,7 +55,11 @@ export default function DashboardPage() {
     setOrderSearchQuery,
     filteredOrders,
     handleRefreshShift,
+    newOrderNotification,
+    dismissNewOrderNotification,
   } = useDashboard();
+
+  const [paymentTable, setPaymentTable] = useState<{ id: number | string; name?: string } | null>(null);
 
   // A. Trường hợp chưa có token: Hiển thị thông báo chuyển hướng sang /login
   if (!token) {
@@ -81,8 +89,8 @@ export default function DashboardPage() {
         <Header />
 
         <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6">
-          {/* Header tiêu đề Bảng Điều Khiển & Nút làm mới ca trực */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Header tiêu đề Bảng Điều Khiển & Bộ lọc thời gian + Nút làm mới ca trực */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-black text-[#26201E] tracking-tight">
                 Bảng Điều Khiển
@@ -92,16 +100,36 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={handleRefreshShift}
-              disabled={isRefreshing}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#EAE3D6] rounded-xl text-xs font-bold text-[#342A27] hover:bg-[#FAF7F2] shadow-xs transition-colors self-start sm:self-auto cursor-pointer"
-            >
-              <RefreshIcon className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>{isRefreshing ? 'Đang cập nhật...' : 'Làm Mới Ca Trực'}</span>
-            </button>
+            <div className="flex items-center flex-wrap gap-2.5 self-start md:self-auto">
+              <DashboardTimeFilter selected={timeRange} onChange={setTimeRange} />
+
+              <button
+                type="button"
+                onClick={handleRefreshShift}
+                disabled={isRefreshing}
+                className="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-[#EAE3D6] rounded-xl text-xs font-bold text-[#342A27] hover:bg-[#FAF7F2] shadow-2xs transition-colors cursor-pointer"
+              >
+                <RefreshIcon className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>{isRefreshing ? 'Đang cập nhật...' : 'Làm Mới Ca Trực'}</span>
+              </button>
+            </div>
           </div>
+
+          {newOrderNotification && (
+            <div role="status" className="flex items-start justify-between gap-4 rounded-xl border border-[#A7F3D0] bg-[#ECFDF5] p-4 text-sm text-[#065F46]">
+              <div>
+                <p className="font-bold">
+                  Có đơn mới #DH{String(newOrderNotification.ma_don).padStart(3, '0')} • Bàn {newOrderNotification.ma_ban} ({newOrderNotification.ten_ban})
+                </p>
+                <p className="mt-1 text-xs">
+                  {newOrderNotification.items.map((item) => `${item.ten_mon} × ${item.so_luong}`).join(', ')}
+                </p>
+              </div>
+              <button type="button" onClick={dismissNewOrderNotification} className="shrink-0 text-xs font-semibold underline">
+                Đã xem
+              </button>
+            </div>
+          )}
 
           {/* 3. Khối 4 Thẻ chỉ số tổng quan */}
           <StatCards metrics={data.metrics} />
@@ -114,6 +142,7 @@ export default function DashboardPage() {
                 filter={tableFilter}
                 onFilterChange={setTableFilter}
                 counts={tableCounts}
+                onPayTable={(id, name) => setPaymentTable({ id, name })}
               />
             </div>
             <div className="min-w-0">
@@ -124,11 +153,24 @@ export default function DashboardPage() {
           {/* 5. Khối dưới: Danh sách đơn hàng gần đây */}
           <RecentOrdersTable
             orders={filteredOrders}
+            totalOrdersCount={data?.totalOrdersCount ?? data?.recentOrders.length}
             searchQuery={orderSearchQuery}
             onSearchChange={setOrderSearchQuery}
           />
         </main>
       </div>
+
+      {/* Modal Thanh toán Bàn từ Sơ đồ bàn ăn trực tiếp */}
+      <TablePaymentModal
+        isOpen={Boolean(paymentTable)}
+        tableId={paymentTable?.id || null}
+        tableName={paymentTable?.name}
+        onClose={() => setPaymentTable(null)}
+        onSuccess={() => {
+          setPaymentTable(null);
+          handleRefreshShift();
+        }}
+      />
     </div>
   );
 }

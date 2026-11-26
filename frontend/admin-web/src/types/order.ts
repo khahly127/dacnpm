@@ -1,5 +1,5 @@
 export type OrderStatus =
-  | 'PENDING'    // Chờ tiếp nhận
+  | 'PENDING'    // Chờ xác nhận
   | 'COOKING'    // Đang nấu / Đang chế biến
   | 'SERVED'     // Đã lên món
   | 'COMPLETED'  // Đã phục vụ / Hoàn tất
@@ -33,7 +33,8 @@ export interface OrderItem {
   relativeTime: string;     // Thời gian tương đối ('3 phút trước')
   createdAt: string;        // ISO timestamp
   status: OrderStatus;      // Trạng thái đơn
-  statusText: string;       // Nhãn tiếng Việt ('Chờ tiếp nhận', 'Đang nấu', 'Đã lên món', 'Đã phục vụ', 'Đã hủy')
+  statusText: string;       // Nhãn tiếng Việt ('Chờ xác nhận', 'Đang nấu', 'Đã lên món', 'Đã phục vụ', 'Đã hủy')
+  paymentStatus?: 'UNPAID' | 'PAID';
 }
 
 export interface OrderStats {

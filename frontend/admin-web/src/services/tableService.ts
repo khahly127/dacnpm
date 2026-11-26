@@ -1,4 +1,4 @@
-import { TableItem, TableStats, CreateTableInput, UpdateTableInput, TableStatus, TableArea } from '../types/table';
+import { TableItem, TableStats, CreateTableInput, UpdateTableInput, TableStatus, TableArea, PaymentQrData } from '../types/table';
 import { authService } from './authService';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
@@ -51,8 +51,12 @@ interface BackendTable {
     ma_don: number;
     so_mon: number;
     thoi_gian_tao: string;
+    thoi_gian_bat_dau?: string;
     tong_tien: number;
     trang_thai: string;
+    so_don?: number;
+    danh_sach_ma_don?: number[];
+    has_pending?: boolean;
   };
 }
 
@@ -96,10 +100,16 @@ function mapBackendToTableItem(item: BackendTable): TableItem {
 
   if (status === 'occupied') {
     if (item.don_hang_hien_tai) {
+      const active = item.don_hang_hien_tai;
+      const orderCount = active.so_don || 1;
+      const orderCodeText = orderCount > 1 && active.danh_sach_ma_don?.length
+        ? `${orderCount} đợt: ${active.danh_sach_ma_don.map((m: number) => `#DH${String(m).padStart(3, '0')}`).join(', ')}`
+        : `#DH${String(active.ma_don).padStart(3, '0')}`;
+
       tableItem.occupiedInfo = {
-        orderCode: `#DH${String(item.don_hang_hien_tai.ma_don).padStart(3, '0')}`,
-        dishCount: item.don_hang_hien_tai.so_mon || 1,
-        duration: formatDuration(item.don_hang_hien_tai.thoi_gian_tao),
+        orderCode: orderCodeText,
+        dishCount: active.so_mon || 1,
+        duration: formatDuration(active.thoi_gian_bat_dau || active.thoi_gian_tao),
         guestCount: tableItem.seats,
       };
     } else {
@@ -254,5 +264,41 @@ export const tableService = {
 
   async toggleQrStatus(id: string, currentState?: boolean): Promise<boolean> {
     return currentState !== undefined ? !currentState : true;
+  },
+
+  async getPaymentQr(tableId: string | number): Promise<PaymentQrData> {
+    const response = await fetch(`${API_BASE_URL}/qr/payment/${tableId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authService.getToken() ? { Authorization: `Bearer ${authService.getToken()}` } : {}),
+      },
+    });
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Không thể tạo mã VietQR');
+    }
+    return result.data as PaymentQrData;
+  },
+
+  /**
+   * Thanh toán gộp theo bàn và giải phóng bàn về Bàn trống
+   */
+  async checkoutTable(tableId: string | number, paymentMethod: string = 'TIEN_MAT'): Promise<{ success: boolean; message: string; data?: any }> {
+    const token = authService.getToken();
+    const response = await fetch(`${API_BASE_URL}/tables/${tableId}/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({ paymentMethod }),
+    });
+
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || 'Thanh toán bàn không thành công');
+    }
+
+    return result;
   },
 };

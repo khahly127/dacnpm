@@ -139,4 +139,80 @@ export const authService = {
     if (typeof window === 'undefined') return null;
     return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
   },
+
+  /**
+   * Cập nhật thông tin cá nhân (họ tên)
+   */
+  async updateProfile(name: string): Promise<{ success: boolean; message?: string; user?: AuthUser }> {
+    try {
+      const token = this.getToken();
+      if (!token) return { success: false, message: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.' };
+
+      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ho_ten: name.trim() }),
+      });
+
+      const resJson = await response.json();
+      if (!response.ok || !resJson.success) {
+        return { success: false, message: resJson.message || 'Cập nhật thông tin thất bại.' };
+      }
+
+      // Cập nhật lại local user
+      const currentUser = this.getCurrentUser();
+      if (currentUser) {
+        const updatedUser: AuthUser = {
+          ...currentUser,
+          name: name.trim(),
+        };
+        const hasLocalStorage = !!localStorage.getItem('auth_user');
+        if (hasLocalStorage) {
+          localStorage.setItem('auth_user', JSON.stringify(updatedUser));
+        } else {
+          sessionStorage.setItem('auth_user', JSON.stringify(updatedUser));
+        }
+        cachedRaw = null;
+        cachedUser = null;
+        notifyAuthChange();
+      }
+
+      return { success: true, message: 'Cập nhật thông tin thành công!' };
+    } catch (error) {
+      console.error('Lỗi khi cập nhật profile:', error);
+      return { success: false, message: 'Không thể kết nối đến máy chủ Backend.' };
+    }
+  },
+
+  /**
+   * Đổi mật khẩu cá nhân
+   */
+  async changePassword(currentPassword: string, newPassword: string): Promise<{ success: boolean; message?: string }> {
+    try {
+      const token = this.getToken();
+      if (!token) return { success: false, message: 'Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.' };
+
+      const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+
+      const resJson = await response.json();
+      if (!response.ok || !resJson.success) {
+        return { success: false, message: resJson.message || 'Đổi mật khẩu thất bại.' };
+      }
+
+      return { success: true, message: 'Đổi mật khẩu thành công!' };
+    } catch (error) {
+      console.error('Lỗi khi đổi mật khẩu:', error);
+      return { success: false, message: 'Không thể kết nối đến máy chủ Backend.' };
+    }
+  },
 };

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useTransition } from 'react';
+import React, { createContext, useContext, useState, useTransition, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { tableService } from '@/services/tableService';
 
@@ -68,7 +68,7 @@ export function TableSessionProvider({
     success: true,
   });
 
-  const setTable = (tableIdOrName: string) => {
+  const setTable = useCallback((tableIdOrName: string) => {
     const formatted = tableService.formatTableDisplay(tableIdOrName);
     setTableName(formatted);
     setTableNumber(tableIdOrName);
@@ -76,14 +76,14 @@ export function TableSessionProvider({
       localStorage.setItem(STORAGE_KEYS.TABLE_NAME, formatted);
       localStorage.setItem(STORAGE_KEYS.TABLE_ID, tableIdOrName);
     } catch {}
-  };
+  }, []);
 
-  const handleSetGuestName = (name: string) => {
+  const handleSetGuestName = useCallback((name: string) => {
     setGuestName(name);
     try {
       localStorage.setItem(STORAGE_KEYS.GUEST_NAME, name);
     } catch {}
-  };
+  }, []);
 
   const callStaff = async () => {
     if (isCallingStaff) return;

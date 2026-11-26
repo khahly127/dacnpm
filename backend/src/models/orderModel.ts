@@ -22,7 +22,7 @@ export const orderModel = {
         return data;
     },
     async listByTable(tableId: number) {
-        const { data, error } = await supabase.from('donhang').select('*, chitietdonhang(ma_ct, ma_mon, so_luong, don_gia, ghi_chu, monan(ma_mon, ten_mon, hinh_anh))').eq('ma_ban', tableId).order('thoi_gian_tao', { ascending: false });
+        const { data, error } = await supabase.from('donhang').select('*, chitietdonhang(ma_ct, ma_mon, so_luong, don_gia, ghi_chu, monan(ma_mon, ten_mon, hinh_anh))').eq('ma_ban', tableId).neq('trang_thai_thanh_toan', 'Da thanh toan').order('thoi_gian_tao', { ascending: false });
         if (error) throw new Error(error.message);
         return data;
     },
