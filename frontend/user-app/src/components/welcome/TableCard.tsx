@@ -31,7 +31,10 @@ export function TableCard({
 
         {/* Tên bàn & dòng chú thích gọn gàng, hiển thị trọn vẹn */}
         <div className="flex flex-col min-w-0">
-          <h2 className="text-lg sm:text-[20px] font-bold text-[#231F20] tracking-tight leading-tight truncate">
+          <h2
+            suppressHydrationWarning
+            className="text-lg sm:text-[20px] font-bold text-[#231F20] tracking-tight leading-tight truncate"
+          >
             {tableName}
           </h2>
           <span className="text-xs text-[#8A7D70] font-medium mt-0.5 whitespace-nowrap">

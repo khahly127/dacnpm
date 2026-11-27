@@ -1,12 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Info } from 'lucide-react';
 
 interface TrackingBillSummaryProps {
   grandTotal: number;
   totalDishesCount: number;
   breakdownText?: string;
+  dishesTotal?: number;
+  vatAmount?: number;
 }
 
 function formatCurrency(amount: number): string {
@@ -17,35 +18,56 @@ export function TrackingBillSummary({
   grandTotal,
   totalDishesCount,
   breakdownText,
+  dishesTotal,
+  vatAmount,
 }: TrackingBillSummaryProps) {
+  const calculatedSubtotal =
+    dishesTotal !== undefined && dishesTotal > 0
+      ? dishesTotal
+      : Math.round(grandTotal / 1.08);
+  const calculatedVat =
+    vatAmount !== undefined
+      ? vatAmount
+      : Math.max(0, grandTotal - calculatedSubtotal);
+
   return (
-    <div className="flex flex-col gap-3">
-      {/* Khung tổng tiền tạm tính */}
-      <div className="bg-[#FAF4EC] rounded-2xl p-4 border border-[#EDE5D8] flex items-center justify-between shadow-2xs">
-        <div>
-          <h4 className="text-xs sm:text-sm font-bold text-[#231F20]">
-            Tạm tính toàn bàn ({totalDishesCount} món)
-          </h4>
-          {breakdownText && (
-            <p className="text-[11px] text-[#8C7F72] font-medium mt-0.5">
-              {breakdownText}
-            </p>
-          )}
+    <div className="w-full bg-[#FAF4EC] rounded-2xl p-4 border border-[#EDE5D8] shadow-2xs">
+      <div className="flex flex-col gap-2 text-xs sm:text-sm">
+        {/* Dòng 1: Tiền món ăn */}
+        <div className="flex items-center justify-between text-[#5C5046]">
+          <span>Tiền món ăn ({totalDishesCount} món)</span>
+          <span className="font-semibold text-[#231F20]">
+            {formatCurrency(calculatedSubtotal)}đ
+          </span>
         </div>
 
-        <div className="text-right">
+        {/* Dòng 2: Thuế VAT (8%) */}
+        <div className="flex items-center justify-between text-[#5C5046]">
+          <span>Thuế VAT (8%)</span>
+          <span className="font-semibold text-[#231F20]">
+            +{formatCurrency(calculatedVat)}đ
+          </span>
+        </div>
+
+        {/* Đường phân cách */}
+        <div className="border-b border-[#EDE5D8] my-0.5" />
+
+        {/* Dòng 3: Tạm tính toàn bàn */}
+        <div className="flex items-baseline justify-between pt-0.5">
+          <div className="flex flex-col">
+            <span className="font-bold text-xs sm:text-sm text-[#231F20]">
+              Tạm tính toàn bàn
+            </span>
+            {breakdownText && (
+              <span className="text-[11px] text-[#8C7F72] font-medium mt-0.5">
+                {breakdownText}
+              </span>
+            )}
+          </div>
           <span className="text-base sm:text-lg font-black text-[#8B2323] tracking-tight">
             {formatCurrency(grandTotal)}đ
           </span>
         </div>
-      </div>
-
-      {/* Lời nhắc thanh toán / hỗ trợ từ nhà hàng */}
-      <div className="flex items-start gap-2 px-2 py-1 text-center justify-center">
-        <Info className="w-3.5 h-3.5 text-[#A89E91] shrink-0 mt-0.5" />
-        <p className="text-[11px] text-[#8C7F72] leading-relaxed text-left">
-          Quý khách vui lòng thanh toán tại quầy thu ngân hoặc nhấn <b>Gọi NV</b> trên góc màn hình khi dùng bữa xong.
-        </p>
       </div>
     </div>
   );

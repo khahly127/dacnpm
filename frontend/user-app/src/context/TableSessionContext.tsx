@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useTransition, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useTransition, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { tableService } from '@/services/tableService';
 
@@ -35,27 +35,26 @@ export function TableSessionProvider({
   const router = useRouter();
   const [, startTransition] = useTransition();
 
-  // Lazy initializer to avoid synchronous setState inside useEffect
-  const [tableName, setTableName] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEYS.TABLE_NAME);
-        if (stored && initialTable === '05') return stored;
-      } catch {}
-    }
-    return tableService.formatTableDisplay(initialTable);
-  });
+  // Khởi tạo giá trị đồng nhất giữa Server và Client để tránh lỗi Hydration Mismatch
+  const [tableName, setTableName] = useState<string>(() =>
+    tableService.formatTableDisplay(initialTable)
+  );
 
   const [tableNumber, setTableNumber] = useState<string>(initialTable);
 
-  const [guestName, setGuestName] = useState<string>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        return localStorage.getItem(STORAGE_KEYS.GUEST_NAME) || '';
-      } catch {}
-    }
-    return '';
-  });
+  const [guestName, setGuestName] = useState<string>('');
+
+  // Đồng bộ dữ liệu từ localStorage sau khi client mount
+  useEffect(() => {
+    try {
+      const storedName = localStorage.getItem(STORAGE_KEYS.TABLE_NAME);
+      const storedId = localStorage.getItem(STORAGE_KEYS.TABLE_ID);
+      const storedGuest = localStorage.getItem(STORAGE_KEYS.GUEST_NAME);
+      if (storedName) setTableName(storedName);
+      if (storedId) setTableNumber(storedId);
+      if (storedGuest) setGuestName(storedGuest);
+    } catch {}
+  }, []);
 
   const [isCallingStaff, setIsCallingStaff] = useState<boolean>(false);
   const [callStaffStatus, setCallStaffStatus] = useState<{

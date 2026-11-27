@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Utensils, Clock, RefreshCw, ArrowLeft, ChevronRight, CookingPot, TrendingUp, ReceiptText, Info } from 'lucide-react';
+import { Utensils, Clock, RefreshCw, ArrowLeft, ChevronRight, CookingPot, TrendingUp, ReceiptText } from 'lucide-react';
 import { useTableSession } from '@/hooks/useTableSession';
 import { API_BASE_URL } from '@/lib/utils';
 import { OrderTrackingScreen } from '@/components/tracking/OrderTrackingScreen';
@@ -101,6 +101,24 @@ export function OrderedDishesScreen({ onBackToMenu, initialOrderId }: OrderedDis
       />
     );
   }
+
+  // Tính tổng tiền món ăn trước thuế và VAT của toàn bộ các đợt gọi
+  const totalItemCount = orders.reduce(
+    (count, ord) => count + (ord.chitietdonhang || []).reduce((c, item) => c + (item.so_luong || 1), 0),
+    0
+  );
+  const rawDishesTotal = orders.reduce(
+    (sum, ord) =>
+      sum +
+      (ord.chitietdonhang || []).reduce((dSum, item) => dSum + (item.don_gia || 0) * (item.so_luong || 1), 0),
+    0
+  );
+  const allOrdersGrandTotal = orders.reduce(
+    (sum, ord) => sum + (Number(ord.tong_tien) || 0),
+    0
+  );
+  const allDishesSubtotal = rawDishesTotal > 0 ? rawDishesTotal : Math.round(allOrdersGrandTotal / 1.08);
+  const allVatAmount = Math.max(0, allOrdersGrandTotal - allDishesSubtotal);
 
   return (
     <div className="w-full px-4 py-2.5 flex flex-col gap-3">
@@ -237,7 +255,10 @@ export function OrderedDishesScreen({ onBackToMenu, initialOrderId }: OrderedDis
 
                 {/* Total */}
                 <div className="pt-2.5 mt-2 border-t border-[#F0EBE1] flex items-center justify-between text-xs font-bold text-[#231F20]">
-                  <span>Tổng đơn</span>
+                  <div className="flex flex-col">
+                    <span>Tổng đơn</span>
+                    <span className="text-[10px] text-[#8C7F72] font-normal">Đã gồm VAT (8%)</span>
+                  </div>
                   <span className="text-sm font-extrabold text-[#8B2323]">
                     {Number(ord.tong_tien).toLocaleString('vi-VN')}đ
                   </span>
@@ -254,30 +275,39 @@ export function OrderedDishesScreen({ onBackToMenu, initialOrderId }: OrderedDis
               </div>
             ))}
 
-            {/* Khung Ghi chú / Lời nhắc thanh toán tinh gọn (Hướng 2) */}
-            <div className="pt-1 pb-4 flex flex-col gap-2.5">
-              <div className="bg-[#FAF4EC] rounded-2xl p-4 border border-[#EDE5D8] flex flex-col gap-2.5 shadow-2xs">
-                {/* Dòng tạm tính tổng cả bàn */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#231F20]">
-                    <ReceiptText className="w-4 h-4 text-[#8B2323]" />
-                    <span>
-                      Tạm tính cả bàn ({orders.length} đợt gọi)
+            {/* Khung Tạm tính tổng cả bàn (Đầy đủ 3 dòng minh bạch VAT) */}
+            <div className="pt-1 pb-4">
+              <div className="bg-[#FAF4EC] rounded-2xl p-4 border border-[#EDE5D8] shadow-2xs">
+                <div className="flex flex-col gap-2 text-xs sm:text-sm">
+                  {/* Dòng 1: Tiền món ăn */}
+                  <div className="flex items-center justify-between text-[#5C5046]">
+                    <span>Tiền món ăn ({totalItemCount} món)</span>
+                    <span className="font-semibold text-[#231F20]">
+                      {allDishesSubtotal.toLocaleString('vi-VN')}đ
                     </span>
                   </div>
-                  <span className="text-sm font-black text-[#8B2323]">
-                    {orders
-                      .reduce((sum, ord) => sum + (Number(ord.tong_tien) || 0), 0)
-                      .toLocaleString('vi-VN')}đ
-                  </span>
-                </div>
 
-                {/* Lời nhắc thanh toán & hỗ trợ bàn ăn */}
-                <div className="pt-2 border-t border-[#EDE5D8] flex items-start gap-2 text-[11px] text-[#7A6E62] leading-relaxed">
-                  <Info className="w-3.5 h-3.5 text-[#A89E91] shrink-0 mt-0.5" />
-                  <span>
-                    Khi dùng bữa xong, quý khách có thể nhấn nút <b className="text-[#8B2323]">Gọi NV</b> ở góc trên để yêu cầu thanh toán tại bàn hoặc thanh toán tại quầy thu ngân.
-                  </span>
+                  {/* Dòng 2: Thuế VAT (8%) */}
+                  <div className="flex items-center justify-between text-[#5C5046]">
+                    <span>Thuế VAT (8%)</span>
+                    <span className="font-semibold text-[#231F20]">
+                      +{allVatAmount.toLocaleString('vi-VN')}đ
+                    </span>
+                  </div>
+
+                  {/* Đường phân cách */}
+                  <div className="border-b border-[#EDE5D8] my-0.5" />
+
+                  {/* Dòng 3: Tạm tính cả bàn */}
+                  <div className="flex items-baseline justify-between pt-0.5">
+                    <span className="font-bold text-xs sm:text-sm text-[#231F20] flex items-center gap-1.5">
+                      <ReceiptText className="w-3.5 h-3.5 text-[#8B2323]" />
+                      Tạm tính cả bàn ({orders.length} đợt gọi)
+                    </span>
+                    <span className="text-base sm:text-lg font-black text-[#8B2323] tracking-tight">
+                      {allOrdersGrandTotal.toLocaleString('vi-VN')}đ
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

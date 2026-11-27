@@ -10,6 +10,7 @@ interface BackendDish {
   gia: number;
   hinh_anh?: string | null;
   trang_thai: string;
+  mo_ta?: string | null;
   nhommon?: { ma_nhom: number; ten_nhom: string };
 }
 
@@ -81,7 +82,7 @@ export const dishService = {
         id: String(item.ma_mon || index + 1),
         code: formattedCode,
         name: item.ten_mon,
-        subtitle: 'Món ăn đặc sản Casa Cozy',
+        subtitle: item.mo_ta || '',
         categoryId: item.ma_nhom || 1,
         categoryName: item.nhommon?.ten_nhom || 'Món đặc biệt',
         price: item.gia || 0,
@@ -115,6 +116,7 @@ export const dishService = {
           gia: input.price,
           hinh_anh: input.image?.trim() || null,
           trang_thai: mapEnumToBackendString(input.status),
+          mo_ta: input.subtitle?.trim() || null,
         }),
       });
 
@@ -130,7 +132,7 @@ export const dishService = {
         id: String(item.ma_mon),
         code: `#MA-${String(item.ma_mon).padStart(2, '0')}`,
         name: item.ten_mon,
-        subtitle: input.subtitle?.trim() || undefined,
+        subtitle: item.mo_ta || input.subtitle?.trim() || undefined,
         categoryId: item.ma_nhom,
         categoryName: item.nhommon?.ten_nhom || 'Món mới',
         price: item.gia,
@@ -172,6 +174,7 @@ export const dishService = {
           gia: input.price,
           hinh_anh: input.image?.trim() || null,
           trang_thai: mapEnumToBackendString(input.status),
+          mo_ta: input.subtitle?.trim() || null,
         }),
       });
 
@@ -187,7 +190,7 @@ export const dishService = {
         id: String(item.ma_mon),
         code: `#MA-${String(item.ma_mon).padStart(2, '0')}`,
         name: item.ten_mon,
-        subtitle: input.subtitle?.trim() || undefined,
+        subtitle: item.mo_ta || input.subtitle?.trim() || undefined,
         categoryId: item.ma_nhom,
         categoryName: item.nhommon?.ten_nhom || 'Món ăn',
         price: item.gia,

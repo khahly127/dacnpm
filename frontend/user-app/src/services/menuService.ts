@@ -33,6 +33,7 @@ interface BackendDishRaw {
   gia: number;
   hinh_anh?: string | null;
   trang_thai: string;
+  mo_ta?: string | null;
   nhommon?: {
     ma_nhom: number;
     ten_nhom: string;
@@ -91,7 +92,7 @@ export const menuService = {
         id: item.ma_mon,
         code: `#MA-${String(item.ma_mon).padStart(2, '0')}`,
         name: item.ten_mon,
-        description: getDishDescription(item.ten_mon, categoryName),
+        description: item.mo_ta || getDishDescription(item.ten_mon, categoryName),
         price,
         formattedPrice: formatPrice(price),
         image: resolveImage(item.hinh_anh),

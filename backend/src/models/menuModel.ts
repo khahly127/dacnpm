@@ -2,7 +2,7 @@ import { supabase } from '../config/supabaseClient';
 
 export const menuModel = {
     async getMenu() {
-        const { data, error } = await supabase.from('nhommon').select('ma_nhom, ten_nhom, monan(ma_mon, ten_mon, gia, hinh_anh, trang_thai)').order('ma_nhom');
+        const { data, error } = await supabase.from('nhommon').select('ma_nhom, ten_nhom, monan(ma_mon, ten_mon, gia, hinh_anh, trang_thai, mo_ta)').order('ma_nhom');
         if (error) throw new Error(error.message);
         return data;
     },

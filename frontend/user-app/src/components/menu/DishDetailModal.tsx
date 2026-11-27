@@ -10,6 +10,7 @@ import {
   Utensils,
   Check,
   Edit3,
+  Users,
 } from 'lucide-react';
 import { Dish } from '@/types/menu';
 import { useDishDetail } from '@/hooks/useDishDetail';
@@ -54,7 +55,7 @@ export function DishDetailModal({
 
   if (!isOpen || !dish) return null;
 
-  const portionSubtitle = dishDetailService.getDishPortionSubtitle(dish);
+  const portionBadge = dishDetailService.getDishPortionBadge(dish);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs transition-opacity duration-300">
@@ -78,14 +79,14 @@ export function DishDetailModal({
 
         {/* Scrollable Content Body */}
         <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 no-scrollbar">
-          {/* Large Hero Image */}
-          <div className="relative w-full h-48 sm:h-52 rounded-2xl overflow-hidden bg-[#FAF7F2] border border-[#EFE9DF] shrink-0 mb-4 shadow-2xs">
+          {/* Large Hero Image (Tỉ lệ 4:3 vừa vặn chống phóng to cắt hình) */}
+          <div className="relative w-full aspect-[4/3] max-h-[280px] rounded-2xl overflow-hidden bg-[#FAF7F2] border border-[#EFE9DF] shrink-0 mb-4 shadow-2xs">
             {dish.image && !imageError ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={dish.image}
                 alt={dish.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
                 onError={() => setImageError(true)}
               />
             ) : (
@@ -97,18 +98,35 @@ export function DishDetailModal({
 
           {/* Title & Price Section */}
           <div className="mb-4">
+            {/* Tên món ăn */}
             <h2 className="text-lg sm:text-xl font-bold text-[#231F20] leading-tight">
               {dish.name}
             </h2>
-            <p className="text-xs text-[#8A7D70] font-medium mt-1">
-              {portionSubtitle}
-            </p>
-            <div className="text-xl font-extrabold text-[#8B2323] mt-2">
-              {dish.formattedPrice}
+
+            {/* Đoạn mô tả đặc sản hấp dẫn được đẩy lên ngay dưới tên món */}
+            {dish.description && (
+              <p className="text-xs text-[#6B5E52] mt-1.5 leading-relaxed">
+                {dish.description}
+              </p>
+            )}
+
+            {/* Hàng giá tiền nổi bật kèm Tag khẩu phần gọn gàng */}
+            <div className="flex items-center justify-between gap-2 mt-3 pt-1">
+              <span className="text-xl font-black text-[#8B2323] tracking-tight">
+                {dish.formattedPrice}
+              </span>
+
+              {portionBadge && (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#7A6E62] bg-[#FAF4EC] px-3 py-1 rounded-full border border-[#EDE5D8]">
+                  {portionBadge.includes('khách') || portionBadge.includes('người') ? (
+                    <Users className="w-3.5 h-3.5 text-[#8B2323]" />
+                  ) : (
+                    <Utensils className="w-3.5 h-3.5 text-[#8B2323]" />
+                  )}
+                  <span>{portionBadge}</span>
+                </span>
+              )}
             </div>
-            <p className="text-xs text-[#6B5E52] mt-1.5 leading-relaxed">
-              {dish.description}
-            </p>
           </div>
 
           {/* Option Groups */}

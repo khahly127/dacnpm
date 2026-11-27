@@ -3,12 +3,10 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useTableSession } from '@/hooks/useTableSession';
-import { useCallStaff } from '@/hooks/useCallStaff';
 import { BrandHeader } from './BrandHeader';
 import { TableCard } from './TableCard';
 import { GuestNameInput } from './GuestNameInput';
 import { ActionButtons } from './ActionButtons';
-import { CallStaffModal } from './CallStaffModal';
 
 interface WelcomeScreenProps {
   onChangeTable?: () => void;
@@ -17,7 +15,6 @@ interface WelcomeScreenProps {
 export function WelcomeScreen({ onChangeTable }: WelcomeScreenProps = {}) {
   const router = useRouter();
   const { tableName, guestName, setGuestName, startOrdering } = useTableSession();
-  const { isCallingStaff, callStaffStatus, callStaff, closeFeedbackModal } = useCallStaff();
 
   const handleChangeTable = onChangeTable || (() => router.push('/?scan=true'));
 
@@ -46,24 +43,11 @@ export function WelcomeScreen({ onChangeTable }: WelcomeScreenProps = {}) {
 
             {/* Action Buttons */}
             <div className="mt-3">
-              <ActionButtons
-                onStartOrdering={startOrdering}
-                onCallStaff={callStaff}
-                isCallingStaff={isCallingStaff}
-              />
+              <ActionButtons onStartOrdering={startOrdering} />
             </div>
           </div>
         </div>
       </main>
-
-      {/* Staff Call Feedback Modal */}
-      <CallStaffModal
-        isOpen={callStaffStatus.open}
-        onClose={closeFeedbackModal}
-        tableName={tableName}
-        message={callStaffStatus.message}
-        success={callStaffStatus.success}
-      />
     </div>
   );
 }

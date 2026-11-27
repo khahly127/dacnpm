@@ -151,6 +151,8 @@ export function OrderTrackingScreen({
             grandTotal={session.grandTotal}
             totalDishesCount={session.totalDishesCount}
             breakdownText={session.breakdownText}
+            dishesTotal={session.dishesTotal}
+            vatAmount={session.vatAmount}
           />
         </div>
       )}

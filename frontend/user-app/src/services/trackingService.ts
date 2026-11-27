@@ -231,9 +231,16 @@ export const trackingService = {
       estimatedMinutesText = 'Đã hoàn tất';
     }
 
+    // Tính tổng tiền món ăn trước thuế và VAT 8%
+    const dishesTotal = rounds.reduce(
+      (sum, r) => sum + r.dishes.reduce((dSum, d) => dSum + d.totalPrice, 0),
+      0
+    );
+    const vatAmount = Math.max(0, grandTotal - dishesTotal);
+
     // Chuỗi phân tách chi tiết tổng tiền: 'Đợt 1: 561.600đ + Đợt 2: 183.600đ'
     const breakdownParts = roundSubtotals.map((r) => `${r.label}: ${formatCurrency(r.amount)}đ`);
-    const breakdownText = roundSubtotals.length > 1 ? `${breakdownParts.join(' + ')} (VAT 8%)` : undefined;
+    const breakdownText = roundSubtotals.length > 1 ? `${breakdownParts.join(' + ')} (Đã gồm VAT 8%)` : undefined;
 
     return {
       tableNumber,
@@ -248,6 +255,8 @@ export const trackingService = {
       timelineStep,
       isConfirmed,
       rounds,
+      dishesTotal,
+      vatAmount,
       grandTotal,
       breakdownText,
     };

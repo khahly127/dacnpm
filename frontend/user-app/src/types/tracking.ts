@@ -41,6 +41,8 @@ export interface TableTrackingSession {
   timelineStep: 1 | 2 | 3;      // 1: Chờ xác nhận, 2: Đang chuẩn bị, 3: Lên bàn
   isConfirmed: boolean;         // true: Admin đã bấm Xác nhận duyệt đơn
   rounds: TrackedOrderRound[];
-  grandTotal: number;
+  dishesTotal?: number;         // Tiền món ăn trước thuế
+  vatAmount?: number;           // Thuế VAT 8%
+  grandTotal: number;           // Tổng thanh toán sau thuế
   breakdownText?: string;       // 'Đợt 1: 561.600đ + Đợt 2: 183.600đ (VAT 8%)'
 }
