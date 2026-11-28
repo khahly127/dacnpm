@@ -1,0 +1,511 @@
+{
+  "info": {
+    "_postman_id": "b3e94a82-7f28-485c-a51b-dacnpm-collection",
+    "name": "DACNPM - Restaurant API",
+    "description": "Postman Collection đầy đủ các API kiểm tra và test dữ liệu hệ thống gọi món nhà hàng.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth (Xác thực)",
+      "item": [
+        {
+          "name": "POST Login (Đăng nhập)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.token) {",
+                  "        pm.collectionVariables.set('token', jsonData.token);",
+                  "        console.log('Token đã được lưu tự động:', jsonData.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tai_khoan\": \"admin\",\n  \"mat_khau\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Đăng nhập hệ thống để lấy Bearer token tự động gán vào biến {{token}}."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Menu (Món ăn & Nhóm món)",
+      "item": [
+        {
+          "name": "GET Xem toàn bộ Menu (Public)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/menu",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu"]
+            },
+            "description": "Lấy toàn bộ menu bao gồm các nhóm món và danh sách món ăn bên trong."
+          }
+        },
+        {
+          "name": "GET Danh sách nhóm món (Categories)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/menu/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "categories"]
+            }
+          }
+        },
+        {
+          "name": "POST Tạo nhóm món mới (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten_nhom\": \"Món tráng miệng\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/menu/categories",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "categories"]
+            }
+          }
+        },
+        {
+          "name": "PATCH Sửa nhóm món (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten_nhom\": \"Đồ uống đặc biệt\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/menu/categories/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "categories", "1"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Xóa nhóm món (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/menu/categories/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "categories", "1"]
+            }
+          }
+        },
+        {
+          "name": "GET Danh sách món ăn (Dishes)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/menu/dishes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "dishes"]
+            }
+          }
+        },
+        {
+          "name": "POST Thêm món ăn mới (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ma_nhom\": 1,\n  \"ten_mon\": \"Cơm chiên hải sản\",\n  \"gia\": 45000,\n  \"hinh_anh\": \"https://example.com/com-chien.jpg\",\n  \"trang_thai\": \"Con mon\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/menu/dishes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "dishes"]
+            }
+          }
+        },
+        {
+          "name": "PATCH Cập nhật món ăn (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"gia\": 50000,\n  \"trang_thai\": \"Het mon\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/menu/dishes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "dishes", "1"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Xóa món ăn (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/menu/dishes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "menu", "dishes", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tables (Quản lý Bàn)",
+      "item": [
+        {
+          "name": "GET Danh sách tất cả bàn",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables"]
+            }
+          }
+        },
+        {
+          "name": "GET Chi tiết 1 bàn theo ID (Khách quét QR)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/tables/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables", "1"]
+            }
+          }
+        },
+        {
+          "name": "POST Thêm bàn mới (Admin / Quản lý)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ten_ban\": \"Bàn 01\",\n  \"trang_thai\": \"Trong\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tables",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables"]
+            }
+          }
+        },
+        {
+          "name": "PATCH Cập nhật trạng thái / tên bàn",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trang_thai\": \"Dang phuc vu\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tables/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables", "1"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Xóa bàn (Admin / Quản lý)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/tables/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tables", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders (Đơn hàng)",
+      "item": [
+        {
+          "name": "POST Tạo đơn hàng (Khách gọi món)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ma_ban\": 1,\n  \"items\": [\n    {\n      \"ma_mon\": 1,\n      \"so_luong\": 2,\n      \"ghi_chu\": \"Ít cay\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "GET Danh sách đơn của 1 bàn",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/table/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "table", "1"]
+            }
+          }
+        },
+        {
+          "name": "GET Chi tiết 1 đơn hàng",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1"]
+            }
+          }
+        },
+        {
+          "name": "GET Tất cả đơn cho nhân viên (Staff)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/orders/staff?status=Dang chuan bi",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "staff"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Dang chuan bi",
+                  "description": "Các trạng thái: Dang chuan bi, Dang phuc vu, Hoan tat, Da huy"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "PATCH Cập nhật trạng thái đơn hàng",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trang_thai\": \"Dang phuc vu\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders/1/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "1", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Employees (Quản lý Nhân viên)",
+      "item": [
+        {
+          "name": "GET Danh sách nhân viên (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/employees",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees"]
+            }
+          }
+        },
+        {
+          "name": "POST Tạo tài khoản Quản lý (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ho_ten\": \"Nguyễn Văn A\",\n  \"tai_khoan\": \"quanly01\",\n  \"mat_khau\": \"12345678\",\n  \"vai_tro\": \"QuanLy\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/employees",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees"]
+            }
+          }
+        },
+        {
+          "name": "PATCH Sửa thông tin / mật khẩu nhân viên",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ho_ten\": \"Nguyễn Văn B\",\n  \"mat_khau\": \"newpass123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/employees/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "1"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Xóa tài khoản nhân viên",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/employees/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "employees", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "QR Code (Mã QR Bàn)",
+      "item": [
+        {
+          "name": "GET Tạo và lấy mã QR cho bàn (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/qr/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "qr", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

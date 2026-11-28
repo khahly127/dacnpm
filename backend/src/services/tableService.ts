@@ -26,4 +26,17 @@ export const tableService = {
         if (!Object.keys(changes).length) throw new AppError('Khong co du lieu cap nhat hop le.', 400);
         return tableModel.update(getTableId(idValue), changes);
     },
+    async delete(idValue: unknown) {
+        const tableId = getTableId(idValue);
+        const hasActive = await tableModel.hasActiveOrders(tableId);
+        if (hasActive) {
+            throw new AppError('Bàn đang có đơn hàng chưa hoàn tất, không thể xóa!', 400);
+        }
+        return tableModel.delete(tableId);
+    },
+    async checkout(idValue: unknown, body: Record<string, unknown>) {
+        const tableId = getTableId(idValue);
+        const paymentMethod = typeof body?.paymentMethod === 'string' ? body.paymentMethod : 'TIEN_MAT';
+        return tableModel.checkout(tableId, paymentMethod);
+    },
 };

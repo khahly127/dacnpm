@@ -33,7 +33,11 @@ export const orderService = {
             const quantity = parseId(item?.so_luong, 'So luong');
             if (item.ghi_chu !== undefined && typeof item.ghi_chu !== 'string')
                 throw new AppError('Ghi chu khong hop le.', 400);
-            return { dishId, quantity, note: item.ghi_chu?.trim() || null };
+            const customPrice = item.don_gia !== undefined ? Number(item.don_gia) : undefined;
+            if (customPrice !== undefined && (!Number.isFinite(customPrice) || customPrice < 0)) {
+                throw new AppError('Don gia khong hop le.', 400);
+            }
+            return { dishId, quantity, customPrice, note: item.ghi_chu?.trim() || null };
         });
         const dishes = await menuModel.getDishesByIds([...new Set(validatedItems.map(item => item.dishId))]);
         if (dishes.length !== new Set(validatedItems.map(item => item.dishId)).size)
@@ -44,10 +48,17 @@ export const orderService = {
             if (!dish || normalize(dish.trang_thai) !== 'con mon')
                 throw new AppError(`Mon ${dish?.ten_mon ?? item.dishId} da het.`, 400);
         }
-        const total = validatedItems.reduce((sum, item) => sum + Number(dishMap.get(item.dishId)!.gia) * item.quantity, 0);
+        const itemsWithPrice = validatedItems.map(item => {
+            const basePrice = Number(dishMap.get(item.dishId)!.gia);
+            const unitPrice = item.customPrice !== undefined && item.customPrice >= basePrice ? item.customPrice : basePrice;
+            return { ...item, unitPrice };
+        });
+        const subtotal = itemsWithPrice.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+        const vat = Math.round(subtotal * 0.08);
+        const total = subtotal + vat;
         const order = await orderModel.createOrder({ ma_ban: tableId, tong_tien: total, trang_thai: 'Cho xac nhan' });
         try {
-            await orderModel.createDetails(validatedItems.map(item => ({ ma_don: order.ma_don, ma_mon: item.dishId, so_luong: item.quantity, don_gia: Number(dishMap.get(item.dishId)!.gia), ghi_chu: item.note })));
+            await orderModel.createDetails(itemsWithPrice.map(item => ({ ma_don: order.ma_don, ma_mon: item.dishId, so_luong: item.quantity, don_gia: item.unitPrice, ghi_chu: item.note })));
             await tableModel.update(tableId, { trang_thai: 'Dang phuc vu' });
             return await orderModel.getById(order.ma_don);
         } catch (error) {
@@ -61,9 +72,13 @@ export const orderService = {
         const order = await orderModel.getById(orderId);
         if (!order) throw new AppError('Khong tim thay don hang.', 404);
         const updated = await orderModel.updateStatus(orderId, status as OrderStatus, employeeId);
-        if (status === 'Hoan tat' || status === 'Da huy') {
+        // Chỉ khi đơn bị hủy và bàn không còn đơn nào khác thì mới đưa bàn về Trong.
+        // Đối với 'Hoan tat', bàn vẫn giữ 'Dang phuc vu' để tiếp tục tích lũy bill cho khách cho tới khi nhân viên đổi trạng thái bàn sang 'Trong'.
+        if (status === 'Da huy') {
             const activeOrders = await orderModel.listByTable(order.ma_ban);
-            if (!activeOrders.some(item => item.ma_don !== orderId && !['Hoan tat', 'Da huy'].includes(item.trang_thai))) await tableModel.update(order.ma_ban, { trang_thai: 'Trong' });
+            if (!activeOrders.some(item => item.ma_don !== orderId && item.trang_thai !== 'Da huy')) {
+                await tableModel.update(order.ma_ban, { trang_thai: 'Trong' });
+            }
         }
         return updated;
     },
